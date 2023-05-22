@@ -48,7 +48,6 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       try {
         const { data } = await clientAxios('/users/profile', config);
         setAuth(data);
-        console.log(data)
       } catch (error) {
         console.error(error)
         setAuth(null);

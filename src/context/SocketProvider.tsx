@@ -42,7 +42,7 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token_ev');
     if (!token) {
       return messageNotification('server', 'Registrate para usar el chat');
     };
@@ -89,7 +89,6 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
 
       try {
         const { data } = await clientAxios('/chat');
-        console.log(data)
         const newMessages = data.map((
           chat: DataServer
           ) => ({
