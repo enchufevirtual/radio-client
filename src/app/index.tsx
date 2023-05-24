@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, HashRouter, Routes, Navigate } from 'react-router-dom';
+import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
 import { GlobalStyle } from '../styles/GlobalStyle';
 import { GlobalProvider } from '../context/GlobalProvider';
 import { AuthProvider } from '../context/AuthProvider';
@@ -24,7 +24,7 @@ const App = (): JSX.Element => {
   return (
     <>
     <GlobalStyle />
-    <HashRouter>
+    <BrowserRouter>
       <GlobalProvider>
         <AuthProvider>
           <SocketProvider>
@@ -60,7 +60,7 @@ const App = (): JSX.Element => {
           </SocketProvider>
         </AuthProvider>
       </GlobalProvider>
-    </HashRouter>
+    </BrowserRouter>
     </>
   )
 }
