@@ -2,7 +2,7 @@
   "name": "app-ev-frontend",
   "version": "1.0.0",
   "description": "Radio Manager - Enchufe Virtual",
-  "main": "./src/index.tsx",
+  "main": "/src/index.tsx",
   "scripts": {
     "start": "webpack serve --open --mode development",
     "build": "webpack --mode production",

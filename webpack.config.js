@@ -10,7 +10,8 @@ module.exports = (env) => {
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: 'index.js',
-      clean: true
+      clean: true,
+      publicPath: '/'
     },
     mode: 'development',
     resolve: {
