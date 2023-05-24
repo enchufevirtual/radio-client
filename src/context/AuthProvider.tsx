@@ -38,6 +38,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       const token = localStorage.getItem('token_ev')
       if (!token) {
         setLoading(false);
+        setLoadingPage(false);
         return;
       };
       const config = {
