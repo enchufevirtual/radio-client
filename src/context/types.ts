@@ -68,7 +68,8 @@ export interface AuthContextProps {
   updateProfile: (data: Auth) => void,
   updateUserPassword: (data: UpdateUserDataTypes) => void,
   isUpdating: boolean,
-  success: boolean
+  success: boolean,
+  loadingPage: boolean
 }
 
 export interface Messages {

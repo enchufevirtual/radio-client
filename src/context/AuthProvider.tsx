@@ -26,6 +26,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
   const [auth, setAuth] = useState<Auth>(initialState);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingPage, setLoadingPage] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -46,8 +47,10 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
         }
       }
       try {
+        setLoadingPage(true)
         const { data } = await clientAxios('/users/profile', config);
         setAuth(data);
+        setLoadingPage(false)
       } catch (error) {
         console.error(error)
         setAuth(null);
@@ -85,6 +88,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
     }
     setIsUpdating(true);
     try {
+      setLoadingPage(true)
       const formData = new FormData();
       formData.append('name', name);
       formData.append('email', email);
@@ -97,6 +101,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       messageNotification('send', 'Perfil Actualizado Correctamente');
       setAuth(data);
       setSuccess(true);
+      setLoadingPage(false)
     } catch (error) {
       const { message } = (error as ErrorResponse).response.data;
       if (message === 'Este correo ya está registrado') {
@@ -145,6 +150,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
     auth: memoizedAuth,
     updateProfile,
     updateUserPassword,
+    loadingPage,
     setAuth,
     logOut,
     loading,
