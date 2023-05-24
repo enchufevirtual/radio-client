@@ -12,7 +12,7 @@
     "resolveJsonModule": true,        /* Enable importing .json files. */
     "strictNullChecks": false,
     "sourceMap": true,                /* Create source map files for emitted JavaScript files. */
-    "outDir": "./build",               /* Specify an output folder for all emitted files. */
+    "outDir": "./dist",               /* Specify an output folder for all emitted files. */
     "noEmit": false,                  /* Disable emitting files from a compilation. */
     "isolatedModules": true,
     "esModuleInterop": true,
