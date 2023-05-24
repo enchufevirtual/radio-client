@@ -6,6 +6,7 @@ import { Emojis } from './Emojis';
 import { AlertMessage } from '../alert';
 import randomColor from 'randomcolor';
 import { useSocket } from '../../hooks/useSocket';
+import avatar from '../../public/assets/avatar.jpg';
 
 export const Chat = () => {
 
@@ -78,7 +79,7 @@ export const Chat = () => {
             {message.from && (
               <span>{formatDateTime(message.createAt)}</span>
             )}
-            <img src={`${url}/${message.image ?? 'avatar.jpg'}`} alt="User Image" />
+            <img src={`${message.image ? `${url}/${message.image}` : `${avatar}` } `} alt="User Image" />
             <BodyMessage>
               <h4 style={{ color }}>{message.from}<small>:</small></h4>{message.body}
             </BodyMessage>
