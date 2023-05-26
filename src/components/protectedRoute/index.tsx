@@ -2,6 +2,7 @@ import React from 'react';
 import type { ReactNode } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth'
+import { Loading } from '../loading/Loading';
 
 interface ProtectedRouteProps {
   roles: string[];
@@ -12,7 +13,7 @@ export const ProtectedRoute = ({ roles, children }: ProtectedRouteProps): JSX.El
 
   const { auth, loading } = useAuth();
 
-  if (loading) return <div>Cargando...</div>
+  if (loading) return <Loading />
 
   if (!auth?.id || !roles.includes(auth?.role)) {
     return <Navigate to='/' />

@@ -35,6 +35,8 @@ export type ContextProps = {
   isFooter: boolean,
   setVolumeValue: React.Dispatch<React.SetStateAction<number>>;
   volumeValue: number,
+  handleChat: () => void,
+  openChat: boolean
 }
 
 // AuthProvider

@@ -41,7 +41,7 @@ export const Profile = () => {
       </ContainerImage>
       <ContainerAbout>
         <h3>Acerca de {name}:</h3>
-        <p>{description}</p>
+        <p>{description == 'null' ? '' : description}</p>
       </ContainerAbout>
       <ContainerSocial>
         <h4>Redes Sociales:</h4>

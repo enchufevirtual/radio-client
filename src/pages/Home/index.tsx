@@ -6,10 +6,10 @@ import { useGlobal } from '../../hooks/useGlobal';
 
 export const Home = (): JSX.Element => {
 
-  const { setIsFooter } = useGlobal();
+  const { setIsFooter, openChat } = useGlobal();
 
   return (
-    <div onLoad={() => setIsFooter(false)}>
+    <div style={{overflowY: `${openChat ? 'hidden' : null}`}} onLoad={() => setIsFooter(false)}>
       <Hero />
       <ContainerHome>
         <h1 >Radio <br/> Enchufe Virtual</h1>

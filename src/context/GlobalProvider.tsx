@@ -18,6 +18,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   const [success, setSuccess] = useState(false);
   const [isFooter, setIsFooter] = useState(true);
   const [volumeValue, setVolumeValue] = useState(70);
+  const [openChat, setOpenChat] = useState(false);
   // Audio Player
   const [play, setPlay] = useState(false);
 
@@ -171,6 +172,12 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     audio ? audio.volume = volumeValue / 100 : null;
   }, [volumeValue, audioRef]);
 
+  // Chat
+
+  const handleChat = () => {
+    setOpenChat(!openChat);
+  }
+
 
   const radio = {
     audioRef,
@@ -191,6 +198,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     repeatPassword,
   }
   const global = {
+    openChat,
+    handleChat,
     setIsFooter,
     isFooter,
   }

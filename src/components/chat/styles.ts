@@ -13,6 +13,7 @@ export const ChatStyle = styled.div`
   width: 350px;
   max-width: 90%;
   height: 450px;
+  z-index: 1000;
   overflow: hidden;
   display: grid;
   grid-template-rows: 1fr auto;
@@ -21,14 +22,13 @@ export const ChatStyle = styled.div`
     right: 10px;
     bottom: 80px;
   }
-  @media (max-width: 300px) {
-    position: fixed;
-    top: 50%;
-    right: 0;
-    left: 0;
-    bottom: 240px;
-    margin: auto;
-    transform: translate(-50% -50%);
+  @media (max-width: 768px) {
+    right: 10px;
+    left: 10px;
+    bottom: 80px;
+    width: 100%;
+    max-width: calc(100% - 20px);
+    height: calc(100% - 90px);
   }
 `;
 
@@ -89,8 +89,11 @@ export const Form = styled.form`
     width: 18px;
     height: 18px;
     cursor: pointer;
-  }
 
+    @media (max-width: 370px) {
+      bottom: 67px;
+   }
+  }
   @media (max-width: 370px) {
     flex-direction: column;
     width: 100%;
@@ -99,10 +102,7 @@ export const Form = styled.form`
 
   input {
     ${css`${CssInput}`}
-    @media (max-width: 370px) {
     width: 100%;
-    height: 100%;
-    }
     padding-left: 28px;
     padding-right: 10px;
   }
@@ -112,7 +112,11 @@ export const Form = styled.form`
 
   button {
     ${css`${CssButton}`}
-    width: 100%;
+    width: 80px;
+
+    @media (max-width: 370px) {
+      width: 100%;
+    }
   }
 `;
 // Picker Emojis
@@ -129,12 +133,18 @@ export const ContainerEmojis = styled.div`
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  left: 14px;
+  bottom: 57px;
   overflow: hidden;
   width: fit-content;
-  height: 260px;
+  width: 250px;
+
+  @media (max-width: 370px) {
+    bottom: 104px;
+  }
+  @media (max-width: 299px) {
+    display: none;
+  }
 
   &::after {
     content: '';

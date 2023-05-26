@@ -27,8 +27,12 @@ export const GlobalStyle = createGlobalStyle`
       background: ${SELECT_DEFAULT_COLOR};
       color: #fff;
   }
+  :host {
+    height: 200px !important;
+  }
   /*------bar scroll-------*/
-* { scrollbar-width: thin; }
+* { scrollbar-width: thin;}
+
   :root {
     scrollbar-color: #000 ${SCROLL_BG} !important;
   }

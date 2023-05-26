@@ -29,7 +29,7 @@ module.exports = (env) => {
           use: { loader: 'html-loader' }
         },
         {
-          test: /\.(?:ico|gif|png|jpg|jpeg)$/i,
+          test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/i,
           loader: 'file-loader'
         },
         {

@@ -32,14 +32,15 @@ export const Emojis = (
         data={data}
         onEmojiSelect={handleEmojiSelect}
         style={{ backgroundColor: 'lightblue' }}
-        perLine={7}
+        perLine={6}
         dynamicPerLine={true}
         emojiSize={24}
         theme='dark'
+        navPosition='bottom'
         previewPosition='none'
         locale='es'
         searchPosition='none'
-        maxFrequentRows='4'
+        maxFrequentRows='0'
       />
     </PickerContainerStyle>
   )

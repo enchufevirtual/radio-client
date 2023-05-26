@@ -1,9 +1,6 @@
 import React, { useState, useRef, useEffect, MouseEventHandler } from 'react';
 import { Radio as RadioStyle, DjRadioDetails, ChatRadioEv, PlayPause, AdminDetails, MarqueeText, MarqueeContainer, ChatLogoStyle, ContainerPlayVolume } from './styles';
 import { useGlobal } from '../../hooks/useGlobal';
-import { useAuth } from '../../hooks/useAuth';
-import { useSocket } from '../../hooks/useSocket';
-import { Chat } from '../chat/Chat';
 import { RadioLogo } from './RadioLogo';
 import { ChatLogo } from './ChatLogo';
 import { VolumeLogo } from './VolumeLogo';
@@ -12,11 +9,9 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 export const Radio = () => {
 
-  const { toggleAudio, play, audioRef } = useGlobal();
-  const { auth } = useAuth();
+  const { toggleAudio, play, audioRef, openChat, handleChat } = useGlobal();
 
   const [openVolume, setOpenVolume] = useState(false);
-  const [openChat, setOpenChat] = useState(false);
   const [mouseOver, setMouseOver] = useState(false);
   const textRef = useRef(null);
   const volumeLogoRef = useRef(null);
@@ -24,9 +19,6 @@ export const Radio = () => {
 
   const match = useMediaQuery('(min-width: 991px)');
 
-  const handleChat = () => {
-    setOpenChat(!openChat);
-  }
   useEffect(() => {
     textRef.current.style.animationPlayState = 'running';
   }, []);
@@ -79,7 +71,6 @@ export const Radio = () => {
           <ChatLogo handleChat={handleChat} />
           { mouseOver || openChat  ? <span></span> : null }
         </ChatLogoStyle>
-        { openChat ? <Chat /> : null }
       </ChatRadioEv>
     </RadioStyle>
   )
