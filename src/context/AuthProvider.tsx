@@ -27,37 +27,45 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingPage, setLoadingPage] = useState(true);
+  const [invalidToken, setInvalidToken] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const { messageNotification } = useGlobal();
 
-  useEffect(() => {
-
-    async function authUser() {
-      const token = localStorage.getItem('token_ev')
-      if (!token) {
-        setLoading(false);
-        setLoadingPage(false);
-        return;
-      };
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
-      }
-      try {
-        setLoadingPage(true)
-        const { data } = await clientAxios('/users/profile', config);
-        setAuth(data);
-        setLoadingPage(false)
-      } catch (error) {
-        console.error(error)
-        setAuth(null);
-      }
+  async function authUser() {
+    const token = localStorage.getItem('token_ev')
+    if (!token) {
       setLoading(false);
+      setLoadingPage(false);
+      return;
+    };
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      }
     }
+    try {
+      setLoadingPage(true)
+      const { data } = await clientAxios('/users/profile', config);
+      setAuth(data);
+      setLoadingPage(false)
+    } catch (error) {
+      const { message } = (error as ErrorResponse).response.data;
+      if (message === 'Invalid Token') {
+        localStorage.removeItem('token_ev');
+        setInvalidToken(message);
+        setLoadingPage(false);
+      } else {
+        setInvalidToken('');
+      }
+      setAuth(null);
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
 
     if (!mounted) {
       setMounted(true);
@@ -149,8 +157,10 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
 
   const value = {
     auth: memoizedAuth,
+    authUser,
     updateProfile,
     updateUserPassword,
+    invalidToken,
     loadingPage,
     setAuth,
     logOut,

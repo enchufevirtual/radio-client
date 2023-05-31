@@ -11,13 +11,16 @@ export const Radio = styled.div`
   border-radius: 6px;
   width: 450px;
   height: 70px;
-  z-index: 7;
+  z-index: 11;
   overflow: hidden;
   user-select: none;
 
   .box {
     display: flex;
     place-content: center;
+    @media (max-width: 300px) {
+      justify-content: flex-start;
+    }
   }
 
   @media (max-width: 991px) {
@@ -27,6 +30,9 @@ export const Radio = styled.div`
     right: 0;
     border-top: 1px solid rgb(48, 54, 61);
     border-radius: 0;
+  }
+  @media (max-width: 300px) {
+    grid-template-columns: repeat(2, 1fr);
   }
 `;
 
@@ -44,6 +50,13 @@ export const MarqueeContainer = styled.div`
   position: absolute;
   top: 30px;
   overflow: hidden;
+
+  @media (max-width: 400px) {
+    width: 70px !important;
+  }
+  @media (max-width: 353px) {
+    display: none;
+  }
 `;
 
 export const MarqueeText = styled.span`
@@ -64,6 +77,9 @@ export const DjRadioDetails = styled.div`
     width: 40px;
     height: 40px;
     border-radius: 6px;
+  }
+  @media (max-width: 300px) {
+    display: none;
   }
 `;
 
@@ -207,7 +223,7 @@ export const ChatLogoStyle = styled.div`
 
   svg {
     width: 80px;
-    height: fit-content;
+    height: 100%;
     cursor: pointer;
     z-index: 7;
   }

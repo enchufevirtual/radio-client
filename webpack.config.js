@@ -1,6 +1,7 @@
 const path = require('path');
 const Dotenv = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = (env) => {
 
@@ -11,7 +12,7 @@ module.exports = (env) => {
       path: path.resolve(__dirname, 'dist'),
       filename: 'index.js',
       clean: true,
-      publicPath: '/'
+      publicPath: '/',
     },
     mode: 'development',
     resolve: {
@@ -30,12 +31,15 @@ module.exports = (env) => {
         },
         {
           test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/i,
-          loader: 'file-loader'
-        },
-        {
+          type: 'asset/resource',
+          generator: {
+              filename: 'public/[name].[hash][ext]'
+          }
+      },
+      {
           test: /\.(woff(2)?|eot|ttf|otf|svg)$/,
-          loader: 'file-loader'
-        }
+          type: 'asset/inline',
+      }
       ]
     },
     plugins: [
@@ -46,7 +50,15 @@ module.exports = (env) => {
       }),
       new Dotenv({
         path: './.env'
-      })
+      }),
+      new CopyPlugin({
+        patterns: [
+          {
+            from: path.resolve(__dirname, '_redirects'),
+            to: './',
+          }
+        ]
+    }),
     ],
     devServer: {
       historyApiFallback: true,

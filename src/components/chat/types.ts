@@ -30,5 +30,6 @@ export interface DataServer {
   image: string
   user: {
     name: string,
+    image: string
   }
 }

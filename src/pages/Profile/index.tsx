@@ -19,7 +19,9 @@ export const Profile = () => {
   const { setIsFooter } = useGlobal();
 
   const { name, description, createAt, image} = auth;
-  const url = `${process.env.BACKEND_URL}/${image ?? 'avatar.jpg'}`
+  const url = `${image
+    ? `${process.env.BACKEND_URL}/${image}`
+    : `https://api.multiavatar.com/${name}.svg`}`
 
   const socialmedia = auth.social
   ? Object.entries(auth.social)

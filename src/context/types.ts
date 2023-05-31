@@ -36,7 +36,11 @@ export type ContextProps = {
   setVolumeValue: React.Dispatch<React.SetStateAction<number>>;
   volumeValue: number,
   handleChat: () => void,
-  openChat: boolean
+  openChat: boolean,
+  setCloseLoginChat: React.Dispatch<React.SetStateAction<boolean>>;
+  closeLoginChat: boolean,
+  setMenuNav: React.Dispatch<React.SetStateAction<boolean>>;
+  menuNav: boolean
 }
 
 // AuthProvider
@@ -64,20 +68,27 @@ interface UpdateUserDataTypes {
 
 export interface AuthContextProps {
   auth: Auth,
-  setAuth: React.Dispatch<React.SetStateAction<Auth>>;
-  logOut: () => void;
+  authUser: () => Promise<void>,
+  setAuth: React.Dispatch<React.SetStateAction<Auth>>,
+  logOut: () => void,
   loading: boolean,
   updateProfile: (data: Auth) => void,
   updateUserPassword: (data: UpdateUserDataTypes) => void,
   isUpdating: boolean,
   success: boolean,
-  loadingPage: boolean
+  loadingPage: boolean,
+  invalidToken: string
 }
 
 export interface Messages {
   from: string,
   body: string,
   image: string | Blob,
+  user?: {
+    id: number,
+    image: string,
+    name: string
+  },
   userId?: string | number,
   createAt: Date,
 }
@@ -90,4 +101,6 @@ export interface SocketContextProps {
   message: string,
   lastMessageRef: RefObject<HTMLDivElement>,
   containerRef: RefObject<HTMLDivElement>,
+  allowed: boolean,
+  setAllowed: React.Dispatch<React.SetStateAction<boolean>>,
 }

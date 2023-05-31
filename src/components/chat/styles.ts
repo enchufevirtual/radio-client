@@ -13,7 +13,7 @@ export const ChatStyle = styled.div`
   width: 350px;
   max-width: 90%;
   height: 450px;
-  z-index: 1000;
+  z-index: 10;
   overflow: hidden;
   display: grid;
   grid-template-rows: 1fr auto;
@@ -30,21 +30,32 @@ export const ChatStyle = styled.div`
     max-width: calc(100% - 20px);
     height: calc(100% - 90px);
   }
+  @media (max-width: 480px) {
+    background-color: rgb(33, 38, 45);
+    top: 0;
+    right: 0 !important;
+    left: 0 !important;
+    bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    height: calc(100% - 69px);
+    outline: none;
+    border-radius: 0;
+  }
 `;
 
 export const ContainerMessages = styled.div`
   background-color: rgb(33, 38, 45);
   overflow-y: auto;
   width: auto;
-  height: 92%;
+  height: 95%;
 `;
 export const ContainerUserChat = styled.div`
   display: flex;
   position: relative;
   gap: .5rem;
-  padding: 24px 8px 14px 0;
+  padding: 10px 8px 10px 0px;
   width: 100%;
-  border-bottom: rgb(48, 54, 61) solid 1px;
 
   span {
     position: absolute;
@@ -74,7 +85,6 @@ export const BodyMessage = styled.div`
   }
 `;
 
-
 export const Form = styled.form`
   display: flex;
   justify-content: space-between;
@@ -82,16 +92,19 @@ export const Form = styled.form`
   gap: 10px;
   width: 100%;
   height: 100%;
+  scrollbar-color: transparent transparent;
 
   svg {
     position: absolute;
-    left: 20px;
-    width: 18px;
-    height: 18px;
+    left: 18px;
+    bottom: 20px;
+    width: 20px;
+    height: 20px;
+    margin: 4px;
     cursor: pointer;
 
     @media (max-width: 370px) {
-      bottom: 67px;
+      bottom: 64px;
    }
   }
   @media (max-width: 370px) {
@@ -100,11 +113,19 @@ export const Form = styled.form`
     height: 100%;
   }
 
-  input {
+  textarea {
     ${css`${CssInput}`}
     width: 100%;
-    padding-left: 28px;
-    padding-right: 10px;
+    max-height: 100px !important;
+    padding: 0.6rem 10px 4px 34px;
+    resize: none;
+    font-size: 14px;
+    ::-webkit-scrollbar {
+    display: none;
+    @media (max-width: 768px) {
+      font-size: 15px;
+    }
+  }
   }
   .highlight-input {
     outline: 2px solid ${DEFAULT_BLUE};
@@ -113,10 +134,10 @@ export const Form = styled.form`
   button {
     ${css`${CssButton}`}
     width: 80px;
-
     @media (max-width: 370px) {
       width: 100%;
     }
+    align-self: flex-end;
   }
 `;
 // Picker Emojis
@@ -134,7 +155,7 @@ export const ContainerEmojis = styled.div`
   align-items: center;
   position: absolute;
   left: 14px;
-  bottom: 57px;
+  bottom: 60px;
   overflow: hidden;
   width: fit-content;
   width: 250px;
@@ -160,12 +181,28 @@ export const ContainerEmojis = styled.div`
   }
 `;
 
-export const PositionAlert = styled.div`
+type Allowed = {
+  allowed: boolean;
+}
+
+export const PositionAlert = styled.div<Allowed>`
   position: absolute;
-  width: 90%;
-  bottom: 57px;
+  background-color: ${(props) => !props.allowed ? 'rgb(33, 38, 45)' : null};
+  width: 100%;
+  height: 70px;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: center;
+  align-items: center;
+  // Notification
+  .htDNab {
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 
 

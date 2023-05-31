@@ -10,5 +10,10 @@ export const ContainerLabel = styled.div`
     margin-bottom: 1rem;
     color: ${LINK};
     cursor: pointer;
+    text-align: end;
+
+    @media (max-width: 250px) {
+      display: none;
+    }
   }
 `;

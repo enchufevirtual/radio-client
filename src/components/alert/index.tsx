@@ -10,7 +10,7 @@ type  Data = {
 
 export const AlertMessage = ({data}: Data): JSX.Element => {
   return (
-    <Alert success={data.success}>
+    <Alert id='alert' success={data.success}>
       <i id={`${data.id}-icon`}></i>
       <span id={`${data.id}-alert`}></span>
     </Alert>

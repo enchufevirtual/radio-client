@@ -10,12 +10,14 @@ import { DataServer } from "../components/chat/types";
 
 export const SocketProvider = ({children}: GlobalProviderTypes) => {
 
-  const { auth } = useAuth();
-  const { messageNotification } = useGlobal();
+  const { auth, invalidToken } = useAuth();
+  const { messageNotification, setCloseLoginChat } = useGlobal();
   const [socket, setSocket] = useState(null);
 
   const [isInputEmpty, setIsInputEmpty] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const [allowed, setAllowed] = useState(true);
 
   // Chat Messages
   const [message, setMessage] = useState('');
@@ -44,8 +46,14 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
 
     const token = localStorage.getItem('token_ev');
     if (!token) {
-      return messageNotification('server', 'Registrate para usar el chat');
+      setAllowed(false);
+      setCloseLoginChat(false)
+      return;
     };
+    if (invalidToken === 'Invalid Token') {
+      setAllowed(false);
+      return;
+    }
 
     if ( message.trim() === '' ) {
       setIsInputEmpty(true);
@@ -68,7 +76,7 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
   useEffect(() => {
     if (socket) {
       const receiveMessage = (message: Messages) => {
-        setMessages([...messages, message]);
+        setMessages((prevMessages) => [...prevMessages, message]);
       };
 
       socket.on('server:message', receiveMessage);
@@ -94,7 +102,7 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
           ) => ({
           from: chat.user?.name,
           body: chat.message,
-          image: chat.image,
+          image: chat.user?.image,
           createAt: chat.createAt
         }));
         setMessages(prevMessages => [...prevMessages, ...newMessages]);
@@ -113,6 +121,8 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
     message,
     lastMessageRef,
     containerRef,
+    allowed,
+    setAllowed
   }
 
   return (

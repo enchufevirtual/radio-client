@@ -1,50 +1,54 @@
-import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import type { FormEvent } from 'react'
+import { useEffect, useState } from "react";
 import { useGlobal } from "./useGlobal";
 import { clientAxios } from "../config/axios";
 import { ErrorResponse } from "types/types";
 import { useAuth } from "./useAuth";
+import { useSocket } from "./useSocket";
 
-export function useLogin() {
+export function useLoginChat() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { messageNotification } = useGlobal();
-  const navigate = useNavigate();
+  const { setAllowed } = useSocket();
 
-  let result = true;
   const { setAuth, authUser } = useAuth();
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  useEffect(() => {
+    messageNotification('alert', '');
+  }, [email, password]);
 
-    if (email === '') {
-      messageNotification('email', 'Ingrese un Email');
-      result = false;
+  async function handleLogin() {
+
+    if (!email.trim()) {
+      return messageNotification('alert', 'Ingrese su correo');
+    } else if (!isEmail(email)) {
+      return messageNotification('alert', 'Use un correo válido');
     }
     if (password === '') {
-      messageNotification('password', 'Ingrese un password');
-      result = false;
+      return messageNotification('alert', 'Ingrese su password');
     }
-    if (!result) return;
+    function isEmail(email: string): boolean {
+      return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email);
+    }
+
     try {
       const { data } = await  clientAxios.post('/users/login', { email, password });
       localStorage.setItem('token_ev', data.token);
       setAuth(data);
+      setAllowed(true);
       authUser();
-      navigate('/');
     } catch (error) {
       const { message } = (error as ErrorResponse).response.data;
       console.clear();
       if (message == 'Esta cuenta no existe') {
-        messageNotification('email', message);
+        messageNotification('alert', message);
       }
       if (message == 'Tu cuenta no ha sido confirmada') {
-        messageNotification('email', message);
+        messageNotification('alert', message);
       }
       if (message == 'Lo siento, la contraseña que ha ingresado no es correcta.') {
-        messageNotification('password', message);
+        messageNotification('alert', 'Contraseña incorrecta');
       }
     }
   }
@@ -54,6 +58,6 @@ export function useLogin() {
     password,
     setEmail,
     setPassword,
-    handleSubmit
+    handleLogin
   }
 }

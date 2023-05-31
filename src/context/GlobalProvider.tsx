@@ -19,6 +19,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   const [isFooter, setIsFooter] = useState(true);
   const [volumeValue, setVolumeValue] = useState(70);
   const [openChat, setOpenChat] = useState(false);
+  const [closeLoginChat, setCloseLoginChat] = useState(false);
+  const [menuNav, setMenuNav] = useState(false);
   // Audio Player
   const [play, setPlay] = useState(false);
 
@@ -82,6 +84,9 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         if (element) element.innerHTML = ''
         if (icon) icon.classList.remove('fas', 'fa-exclamation')
       });
+      if (!message) {
+        icon.classList.remove('fas', 'fa-exclamation')
+      }
     }
     private regexName(name: string): boolean {
       return /^[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s]+$/.test(name);
@@ -105,8 +110,14 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
 
         await clientAxios.post('/users', formData);
         setSuccess(true);
-        CheckBeforeSend.messageNotification('send', 'Revise su correo electrónico para activar su cuenta. ¡Gracias por registrarse!')
-
+        CheckBeforeSend.messageNotification('send', 'Revise su correo electrónico para activar su cuenta. ¡Gracias por registrarse!');
+        setInput({
+          name: '',
+          email: '',
+          password: '',
+          repeatPassword: '',
+          image: ''
+        })
       } catch (error) {
         console.log(error)
         const { message } = (error as ErrorResponse).response.data;
@@ -173,11 +184,10 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   }, [volumeValue, audioRef]);
 
   // Chat
-
   const handleChat = () => {
     setOpenChat(!openChat);
+    setCloseLoginChat(true);
   }
-
 
   const radio = {
     audioRef,
@@ -202,6 +212,10 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     handleChat,
     setIsFooter,
     isFooter,
+    setCloseLoginChat,
+    closeLoginChat,
+    setMenuNav,
+    menuNav
   }
 
   const value = {
