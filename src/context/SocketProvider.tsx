@@ -11,7 +11,7 @@ import { DataServer } from "../components/chat/types";
 export const SocketProvider = ({children}: GlobalProviderTypes) => {
 
   const { auth, invalidToken } = useAuth();
-  const { messageNotification, setCloseLoginChat } = useGlobal();
+  const { messageNotification, setCloseLoginChat, inputRef } = useGlobal();
   const [socket, setSocket] = useState(null);
 
   const [isInputEmpty, setIsInputEmpty] = useState(false);
@@ -70,6 +70,7 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
       socket.emit('client:message', newMessage);
       setMessages([...messages, newMessage]);
       setMessage('');
+      inputRef.current.focus();
     }
   }
 

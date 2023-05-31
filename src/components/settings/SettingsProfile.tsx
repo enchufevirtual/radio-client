@@ -23,9 +23,12 @@ export const SettingsProfile = (): JSX.Element => {
   const { success } = useAuth();
   const { name, description, email, social, image } = profile;
 
+  const api = process.env.API_AVATAR;
+  const key = process.env.API_KEY;
+
   const imageProfile = `${image
     ? `${process.env.BACKEND_URL}/${image}`
-    : `https://api.multiavatar.com/${name}.svg`}`
+    : `${api}/${name}.png?apikey=${key}`}`
 
   if (!profile.id) return null;
 

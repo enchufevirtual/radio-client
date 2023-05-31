@@ -23,6 +23,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   const [menuNav, setMenuNav] = useState(false);
   // Audio Player
   const [play, setPlay] = useState(false);
+  // Textarea Ref Chat
+  const inputRef = useRef(null);
 
   class CheckBeforeSend {
 
@@ -215,7 +217,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     setCloseLoginChat,
     closeLoginChat,
     setMenuNav,
-    menuNav
+    menuNav,
+    inputRef
   }
 
   const value = {

@@ -40,7 +40,8 @@ export type ContextProps = {
   setCloseLoginChat: React.Dispatch<React.SetStateAction<boolean>>;
   closeLoginChat: boolean,
   setMenuNav: React.Dispatch<React.SetStateAction<boolean>>;
-  menuNav: boolean
+  menuNav: boolean,
+  inputRef: RefObject<HTMLTextAreaElement>
 }
 
 // AuthProvider
@@ -103,4 +104,5 @@ export interface SocketContextProps {
   containerRef: RefObject<HTMLDivElement>,
   allowed: boolean,
   setAllowed: React.Dispatch<React.SetStateAction<boolean>>,
+
 }

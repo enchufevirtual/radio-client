@@ -13,14 +13,18 @@ const ContainerNav = (): JSX.Element => {
   const { image, name } = auth;
   const { setMenuNav, menuNav } = useGlobal();
   const imgRef = useRef(null);
+  const truncatedName = name.length > 10 ? name.slice(0, 10) + '...' : name;
+
+  const api = process.env.API_AVATAR;
+  const key = process.env.API_KEY;
 
   const url = `${image
     ? `${process.env.BACKEND_URL}/${image}`
-    : `https://api.multiavatar.com/${name}.svg`}`
+    : `${api}/${name}.png?apikey=${key}`}`
 
   return (
     <ContainerStyle>
-      { !matches ? <p>Bienvenid@, {auth.name}</p> : null }
+      { !matches ? <p>Bienvenid@, {truncatedName}</p> : null }
       <img ref={imgRef} onClick={() => setMenuNav(!menuNav)} src={url} alt="user" />
       { menuNav && <MenuProfile setMenu={setMenuNav} imgRef={imgRef} /> }
     </ContainerStyle>

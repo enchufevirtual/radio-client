@@ -19,7 +19,6 @@ export interface EmojiPickerTypes {
 
 export interface EmojiHandleTypes {
   setMessage: React.Dispatch<React.SetStateAction<string>>,
-  inputRef: RefObject<HTMLInputElement>,
   message: string,
   setCursorPosition:  React.Dispatch<React.SetStateAction<number>>,
 }

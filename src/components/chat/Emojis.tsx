@@ -3,16 +3,18 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { PickerContainerStyle } from './styles';
 import { EmojiHandleTypes, EmojiPickerTypes } from './types';
+import { useGlobal } from '../../hooks/useGlobal';
 
 export const Emojis = (
   {
     setMessage,
-    inputRef,
     message,
     setCursorPosition
   }: EmojiHandleTypes
 
   ): JSX.Element => {
+
+    const { inputRef } = useGlobal();
 
   const handleEmojiSelect = (emoji: EmojiPickerTypes) => {
     const input = inputRef.current;

@@ -107,6 +107,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
 
       const url = `/users/${id}`;
       const { data } = await clientAxios.put(url, formData, config);
+      console.log(data)
       messageNotification('send', 'Perfil Actualizado Correctamente');
       setAuth(data);
       setSuccess(true);

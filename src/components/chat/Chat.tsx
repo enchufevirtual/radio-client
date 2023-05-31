@@ -4,24 +4,23 @@ import { IconEmoji } from './IconEmoji';
 import { Emojis } from './Emojis';
 import randomColor from 'randomcolor';
 import { useSocket } from '../../hooks/useSocket';
-import avatar from '../../public/assets/avatar.jpg';
 import { LoginChat } from './LoginChat';
 import { useGlobal } from '../../hooks/useGlobal';
-import { useAuth } from '../..//hooks/useAuth';
 
 export const Chat = () => {
 
-  const { closeLoginChat, menuNav } = useGlobal();
-  const { auth } = useAuth();
+  const { closeLoginChat, menuNav, inputRef } = useGlobal();
   const [openEmoji, setOpenEmoji] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
-  const inputRef = useRef(null);
+
   const iconRef = useRef(null);
   const emojiContainerRef = useRef(null);
   const [userColors, setUserColors] = useState<Record<string, string>>({});
 
   const { messages, handleSubmit, setMessage, message, isInputEmpty, lastMessageRef, containerRef, allowed } = useSocket();
   const url = process.env.BACKEND_URL;
+  const api = process.env.API_AVATAR;
+  const key = process.env.API_KEY;
 
   const handleEmoji = () => {
     inputRef.current.focus();
@@ -77,10 +76,9 @@ export const Chat = () => {
       <ContainerMessages ref={containerRef} className="container">
       { messages.map((message, index) => {
         let color = userColors[message.from];
-        let nameReplace = message.from.replace(/\s/g, '_');
         let imageUser = `${message.image
           ? `${url}/${message.image}`
-          : `https://api.multiavatar.com/${nameReplace}.svg`}`
+          : `${api}/${message.from}.png?apikey=${key}`}`
         if (!color) {
           color = randomColor();
           setUserColors(prevUserColors => ({
@@ -118,7 +116,6 @@ export const Chat = () => {
         <Emojis
           setMessage={setMessage}
           message={message}
-          inputRef={inputRef}
           setCursorPosition={setCursorPosition}
         />
       }
