@@ -8,8 +8,8 @@ const ContainerButtons = () => {
 
   return (
     <ContainerButtonStyle>
-      <LinkLoginButton to='/login'>Entrar</LinkLoginButton>
-      {match && <LinkRegisterButton to='/register'>Registrarse</LinkRegisterButton>}
+      <LinkLoginButton aria-label='Entrar' to='/login'>Entrar</LinkLoginButton>
+      {match && <LinkRegisterButton aria-label='Registrarse' to='/register'>Registrarse</LinkRegisterButton>}
     </ContainerButtonStyle>
   )
 }

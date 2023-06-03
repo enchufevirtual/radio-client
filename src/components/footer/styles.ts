@@ -13,7 +13,7 @@ export const FooterStyle = styled.footer`
   text-align: center;
   width: 90%;
   margin-top: 2rem;
-  z-index: -1;
+  z-index: 1;
   ::before {
     content: '';
     position: absolute;

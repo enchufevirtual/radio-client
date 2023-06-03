@@ -28,7 +28,7 @@ export const Form = (): JSX.Element => {
         />
         <AlertMessage data={{id: 'resetPassword', success}} />
       </GroupInput>
-      <Button type="submit"> Enviar Intrucciones </Button>
+      <Button aria-label="send instructions" type="submit"> Enviar Intrucciones </Button>
     </FormStyles>
   )
 }

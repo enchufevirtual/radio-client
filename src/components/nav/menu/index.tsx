@@ -31,7 +31,7 @@ export const MenuProfile = ({setMenu, imgRef}: MenuProfileProps): JSX.Element =>
     <NavStyle ref={menuRef}>
       <Link to='/profile'>Perfil</Link>
       <Link to='/settings'>Editar Perfil</Link>
-      <button type='button' onClick={logOut}>Cerrar Sesión</button>
+      <button aria-label='logout' type='button' onClick={logOut}>Cerrar Sesión</button>
     </NavStyle>
   )
 }

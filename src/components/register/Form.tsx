@@ -60,7 +60,7 @@ export const Form = (): JSX.Element => {
         />
         <AlertMessage data={{id: 'image'}} />
       </GroupInput>
-      <Button type="submit">Registrar</Button>
+      <Button aria-label="Registrar" type="submit">Registrar</Button>
     </FormStyles>
   )
 }

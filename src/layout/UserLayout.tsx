@@ -6,7 +6,7 @@ import { Footer } from "../components/footer";
 import { Radio } from "../components/radio";
 import { useGlobal } from "../hooks/useGlobal";
 import { useAuth } from "../hooks/useAuth";
-import { Loading } from "../components/loading/Loading";
+import { Loading } from "../components/loadings/Loading";
 import { Chat } from "../components/chat/Chat";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 

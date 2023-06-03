@@ -8,6 +8,7 @@ export const Main = styled.main`
   justify-content: center;
   align-items: center;
   padding: 1rem;
+  padding-bottom: 70px;
 `;
 
 export const MainUser = styled(Main)`

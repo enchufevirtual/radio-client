@@ -35,7 +35,7 @@ export const Form = (): JSX.Element => {
           />
           <AlertMessage data={{id: 'newPassword', success}} />
         </GroupInput>
-        <Button type="submit" disabled={success}> Guardar Contraseña </Button>
+        <Button aria-label="save password" type="submit" disabled={success}> Guardar Contraseña </Button>
       </>
       ):(
         <ListTokenError />

@@ -56,7 +56,7 @@ export const SettingsSecurity = (): JSX.Element => {
             </GroupInput>
           </div>
         </ContainerInputs>
-        <SettingsButton type='submit'>Actualizar Contraseña</SettingsButton>
+        <SettingsButton aria-label='update password' type='submit'>Actualizar Contraseña</SettingsButton>
         <AlertMessage data={{id: 'send'}} />
       </Form>
     </ContainerSettings>

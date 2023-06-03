@@ -104,5 +104,5 @@ export interface SocketContextProps {
   containerRef: RefObject<HTMLDivElement>,
   allowed: boolean,
   setAllowed: React.Dispatch<React.SetStateAction<boolean>>,
-
+  loadingChat: boolean
 }

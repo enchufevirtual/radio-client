@@ -43,7 +43,7 @@ export const Form = (): JSX.Element => {
         />
         <AlertMessage data={{id: 'password'}} />
       </GroupInput>
-      <Button type="submit"> Ingresar </Button>
+      <Button aria-label="Ingresar" type="submit"> Ingresar </Button>
     </FormStyles>
   )
 }

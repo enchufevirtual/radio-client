@@ -3,8 +3,9 @@ import { ChatStyle, BodyMessage, ContainerMessages, Form, ContainerUserChat, Con
 import { IconEmoji } from './IconEmoji';
 import { Emojis } from './Emojis';
 import randomColor from 'randomcolor';
-import { useSocket } from '../../hooks/useSocket';
 import { LoginChat } from './LoginChat';
+import { LoadingChat } from '../loadings/LoadingChat';
+import { useSocket } from '../../hooks/useSocket';
 import { useGlobal } from '../../hooks/useGlobal';
 
 export const Chat = () => {
@@ -17,7 +18,7 @@ export const Chat = () => {
   const emojiContainerRef = useRef(null);
   const [userColors, setUserColors] = useState<Record<string, string>>({});
 
-  const { messages, handleSubmit, setMessage, message, isInputEmpty, lastMessageRef, containerRef, allowed } = useSocket();
+  const { messages, handleSubmit, setMessage, message, isInputEmpty, lastMessageRef, containerRef, allowed, loadingChat } = useSocket();
   const url = process.env.BACKEND_URL;
   const api = process.env.API_AVATAR;
   const key = process.env.API_KEY;
@@ -70,9 +71,9 @@ export const Chat = () => {
     if (lastMessageRef.current) lastMessageRef.current.scrollIntoView();
   };
 
-
   return (
     <ChatStyle style={{zIndex: menuNav ? 7 : 10}}>
+      { loadingChat && <LoadingChat /> }
       <ContainerMessages ref={containerRef} className="container">
       { messages.map((message, index) => {
         let color = userColors[message.from];
@@ -109,7 +110,7 @@ export const Chat = () => {
           onChange={handleInputChange}
           className={isInputEmpty ? 'highlight-input' : ''}
         />
-        <button>Enviar</button>
+        <button aria-label='Enviar'>Enviar</button>
       </Form>
       <ContainerEmojis ref={emojiContainerRef}>
       { openEmoji &&

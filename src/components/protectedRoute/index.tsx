@@ -2,7 +2,7 @@ import React from 'react';
 import type { ReactNode } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth'
-import { Loading } from '../loading/Loading';
+import { Loading } from '../loadings/Loading';
 
 interface ProtectedRouteProps {
   roles: string[];

@@ -133,7 +133,7 @@ export const SettingsProfile = (): JSX.Element => {
             <p>El formato debe ser JPEG, PNG o GIF y no puede superar los 2 MB.</p>
           </ContainerImage>
         </ContainerInputs>
-        <SettingsButton type='submit'>Actualizar Perfil</SettingsButton>
+        <SettingsButton aria-label='update' type='submit'>Actualizar Perfil</SettingsButton>
         <AlertMessage data={{id: 'send', success: success}} />
       </Form>
     </ContainerSettings>

@@ -17,6 +17,9 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
   const [isInputEmpty, setIsInputEmpty] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Loading Chat
+  const [loadingChat, setLoadingChat] = useState(true);
+
   const [allowed, setAllowed] = useState(true);
 
   // Chat Messages
@@ -97,6 +100,7 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
     const getMessages = async () => {
 
       try {
+        setLoadingChat(true);
         const { data } = await clientAxios('/chat');
         const newMessages = data.map((
           chat: DataServer
@@ -109,6 +113,8 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
         setMessages(prevMessages => [...prevMessages, ...newMessages]);
       } catch (error) {
         messageNotification('server', 'Hubo un error, recarga la página')
+      } finally {
+        setLoadingChat(false);
       }
     }
     getMessages();
@@ -123,7 +129,8 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
     lastMessageRef,
     containerRef,
     allowed,
-    setAllowed
+    setAllowed,
+    loadingChat,
   }
 
   return (

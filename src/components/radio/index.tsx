@@ -59,7 +59,7 @@ export const Radio = () => {
           <source src="https://stream.zeno.fm/ezj7hvwkfk2tv" type="audio/mpeg" />
       </audio>
       <ContainerPlayVolume className='box'>
-        <PlayPause type='button' onClick={() => toggleAudio()}>
+        <PlayPause aria-label='PlayPause' type='button' onClick={() => toggleAudio()}>
             <span className={play ? "play active" : "play"}></span>
             <span className={play ? "pause active" : "pause"}></span>
         </PlayPause>
