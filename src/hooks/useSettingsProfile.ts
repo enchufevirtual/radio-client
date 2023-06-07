@@ -31,7 +31,8 @@ export function useSettingsProfile() {
   const { messageNotification } = useGlobal();
 
   const onChange: InputChangeEvent = (event) => {
-    const { name, value } = event.target;
+    let { name, value } = event.target;
+
     setProfile({
       ...profile,
       [name]: value
@@ -57,7 +58,7 @@ export function useSettingsProfile() {
     }
     setProfile({
       ...profile,
-      [name]: files![0]
+      [name]: files && files[0] ? files[0] : ''
     })
   }
 

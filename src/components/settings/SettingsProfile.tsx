@@ -57,7 +57,7 @@ export const SettingsProfile = (): JSX.Element => {
                 type="text"
                 id='username'
                 name='username'
-                value={username !== 'null' ? username : ''}
+                value={username ?? ''}
                 onChange={onChange}
               />
               <AlertMessage data={{id: 'username'}} />
@@ -68,7 +68,7 @@ export const SettingsProfile = (): JSX.Element => {
                 id='description'
                 name='description'
                 placeholder='Escribe sobre ti...'
-                value={profile.description !== "null" ? description : ""}
+                value={description ?? ''}
                 onChange={onChange}
               />
             </GroupInput>

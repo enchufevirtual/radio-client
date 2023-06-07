@@ -86,7 +86,10 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
   }
 
   const updateProfile = async (updateData: Auth) => {
+
     const { name, username, description, email, social, image, id } = updateData;
+    const descriptionString = description !== null ? description : '';
+    const usernameString = username !== null ? username : '';
 
     const token = localStorage.getItem('token_ev');
     if (!token) {
@@ -104,9 +107,9 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       setLoadingPage(true)
       const formData = new FormData();
       formData.append('name', name);
-      formData.append('username', username);
+      formData.append('username', usernameString);
       formData.append('email', email);
-      formData.append('description', description);
+      formData.append('description', descriptionString);
       formData.append('social', JSON.stringify(social));
       formData.append('image', image);
 
