@@ -16,6 +16,7 @@ import { SettingsProfile } from '../components/settings/SettingsProfile';
 import { SettingsSecurity } from '../components/settings/SettingsSecurity';
 import Admin from '../pages/Admin';
 import { Home } from '../pages/Home';
+import { NotFound } from '../pages/NotFound';
 
 const App = (): JSX.Element => {
 
@@ -43,7 +44,7 @@ const App = (): JSX.Element => {
               <Route path='/' element={<UserLayout />}>
                 <Route index element={<Home />} />
                 <Route element={<ProtectedRoute roles={['user', 'admin']} />}>
-                  <Route path='/profile' element={<Profile />} />
+                  <Route path='/:username' element={<Profile />} />
                   <Route path='/settings' element={<Settings />}>
                     <Route index element={<SettingsProfile />} />
                     <Route path='profile' element={<SettingsProfile />} />
@@ -56,6 +57,7 @@ const App = (): JSX.Element => {
                   </ProtectedRoute>}
                 />
               </Route>
+              <Route path='*' element={<NotFound />} />
             </Routes>
           </SocketProvider>
         </AuthProvider>

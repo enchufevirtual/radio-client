@@ -14,6 +14,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
     id: "",
     image: '',
     name: "",
+    username: "",
     role: "",
     social: {
       facebook: '',
@@ -24,6 +25,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
   }
 
   const [auth, setAuth] = useState<Auth>(initialState);
+  const [profile, setProfile] = useState<Auth>(initialState);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingPage, setLoadingPage] = useState(true);
@@ -50,6 +52,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       setLoadingPage(true)
       const { data } = await clientAxios('/users/profile', config);
       setAuth(data);
+      setProfile(data);
       setLoadingPage(false)
     } catch (error) {
       const { message } = (error as ErrorResponse).response.data;
@@ -61,6 +64,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
         setInvalidToken('');
       }
       setAuth(null);
+      setProfile(null);
     }
     setLoading(false);
   }
@@ -82,7 +86,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
   }
 
   const updateProfile = async (updateData: Auth) => {
-    const { name, description, email, social, image, id } = updateData;
+    const { name, username, description, email, social, image, id } = updateData;
 
     const token = localStorage.getItem('token_ev');
     if (!token) {
@@ -100,6 +104,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       setLoadingPage(true)
       const formData = new FormData();
       formData.append('name', name);
+      formData.append('username', username);
       formData.append('email', email);
       formData.append('description', description);
       formData.append('social', JSON.stringify(social));
@@ -107,7 +112,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
 
       const url = `/users/${id}`;
       const { data } = await clientAxios.put(url, formData, config);
-      console.log(data)
+      messageNotification('image-alert', '');
       messageNotification('send', 'Perfil Actualizado Correctamente');
       setAuth(data);
       setSuccess(true);
@@ -116,9 +121,17 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       const { message } = (error as ErrorResponse).response.data;
       if (message === 'Este correo ya está registrado') {
         messageNotification('email', message);
-      } else {
-        messageNotification('send', 'Hubo un error');
+        messageNotification('send', 'Hubo un error con el correo');
       }
+      if (message === 'Este nombre de usuario no está disponible.') {
+        messageNotification('username', message);
+        messageNotification('send', 'Hubo un error con el nombre de usuario');
+      }
+      if (message === 'El archivo excede el límite - (MAX 10MB)') {
+        messageNotification('image-alert', message);
+        messageNotification('send', 'Hubo un error con la imagen');
+      }
+      setLoadingPage(false)
       setSuccess(false)
     } finally {
       setIsUpdating(false);
@@ -155,14 +168,18 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
   }
 
   const memoizedAuth = useMemo(() => auth, [auth]);
+  const memoizedAuthProfile = useMemo(() => profile, [profile]);
 
   const value = {
     auth: memoizedAuth,
+    profile: memoizedAuthProfile,
+    setProfile,
     authUser,
     updateProfile,
     updateUserPassword,
     invalidToken,
     loadingPage,
+    setLoadingPage,
     setAuth,
     logOut,
     loading,

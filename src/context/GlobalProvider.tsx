@@ -50,7 +50,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         CheckBeforeSend.messageNotification('name', 'El nombre es obligatorio');
         result = false;
       } else if (!this.regexName(nameValue)) {
-        CheckBeforeSend.messageNotification('name', 'El campo "Nombre" solo acepta letras y espacios.');
+        CheckBeforeSend.messageNotification('name', 'El campo "Nombre" solo acepta letras, números y espacios.');
         result = false;
       }
       if (!emailValue) {
@@ -91,7 +91,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       }
     }
     private regexName(name: string): boolean {
-      return /^[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s]+$/.test(name);
+      return /^[A-Za-z0-9ÑñÁáÉéÍíÓóÚúÜü\s]+$/.test(name);
     }
     private isEmail(email: string): boolean {
       return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email);
@@ -105,9 +105,9 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       try {
 
         const formData = new FormData();
-        formData.append('name', name);
-        formData.append('email', email);
-        formData.append('password', password);
+        formData.append('name', name.trim());
+        formData.append('email', email.trim());
+        formData.append('password', password.trim());
         formData.append('image', image);
 
         await clientAxios.post('/users', formData);
@@ -126,7 +126,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         if (message == 'Este correo ya está registrado') {
           CheckBeforeSend.messageNotification('email', message)
         }
-        if (message == 'El archivo excede el límite - (MAX 2MB)') {
+        if (message == 'El archivo excede el límite - (MAX 10MB)') {
           CheckBeforeSend.messageNotification('image', message)
         }
         if (message == 'Debe subir una imagen válida.') {
@@ -211,6 +211,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   }
   const global = {
     openChat,
+    setOpenChat,
     handleChat,
     setIsFooter,
     isFooter,

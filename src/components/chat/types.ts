@@ -24,11 +24,13 @@ export interface EmojiHandleTypes {
 }
 
 export interface DataServer {
+  userId: string | number;
   message: string;
-  createAt: string
-  image: string
+  createAt: string;
+  image: string;
   user: {
     name: string,
     image: string
+    username: string
   }
 }

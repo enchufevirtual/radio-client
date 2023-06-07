@@ -69,6 +69,10 @@ export const ContainerUserChat = styled.div`
     width: 26px;
     height: 26px;
     border-radius: 50%;
+    cursor: pointer;
+  }
+  h4 {
+    cursor: pointer;
   }
 
 `;

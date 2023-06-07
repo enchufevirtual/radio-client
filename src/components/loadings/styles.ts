@@ -6,7 +6,7 @@ export const LoadingStyles = styled.div`
   align-items: center;
   position: fixed;
   background-color: #161B22;
-  z-index: 1000;
+  z-index: 9;
   top: 0;
   bottom: 0;
   left: 0;

@@ -37,6 +37,7 @@ export type ContextProps = {
   volumeValue: number,
   handleChat: () => void,
   openChat: boolean,
+  setOpenChat: React.Dispatch<React.SetStateAction<boolean>>;
   setCloseLoginChat: React.Dispatch<React.SetStateAction<boolean>>;
   closeLoginChat: boolean,
   setMenuNav: React.Dispatch<React.SetStateAction<boolean>>;
@@ -53,6 +54,7 @@ export type Auth = {
   id: number | string,
   image: string | Blob,
   name: string,
+  username: string,
   role: string,
   social?: {
     facebook: string,
@@ -69,6 +71,8 @@ interface UpdateUserDataTypes {
 
 export interface AuthContextProps {
   auth: Auth,
+  profile: Auth,
+  setProfile: React.Dispatch<React.SetStateAction<Auth>>,
   authUser: () => Promise<void>,
   setAuth: React.Dispatch<React.SetStateAction<Auth>>,
   logOut: () => void,
@@ -78,6 +82,7 @@ export interface AuthContextProps {
   isUpdating: boolean,
   success: boolean,
   loadingPage: boolean,
+  setLoadingPage: React.Dispatch<React.SetStateAction<boolean>>,
   invalidToken: string
 }
 
@@ -85,10 +90,12 @@ export interface Messages {
   from: string,
   body: string,
   image: string | Blob,
+  name: string,
   user?: {
     id: number,
     image: string,
-    name: string
+    name: string,
+    username: string
   },
   userId?: string | number,
   createAt: Date,

@@ -64,7 +64,8 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
       setIsInputEmpty(false);
 
       const newMessage = {
-        from: auth.name,
+        from: auth.username,
+        name: auth.name,
         body: message,
         image: auth.image,
         userId: auth.id,
@@ -105,7 +106,9 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
         const newMessages = data.map((
           chat: DataServer
           ) => ({
-          from: chat.user?.name,
+          userId: chat.userId,
+          from: chat.user?.username,
+          name: chat.user?.name,
           body: chat.message,
           image: chat.user?.image,
           createAt: chat.createAt

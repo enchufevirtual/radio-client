@@ -6,7 +6,7 @@ import { useAuth } from '../../../hooks/useAuth';
 
 export const MenuProfile = ({setMenu, imgRef}: MenuProfileProps): JSX.Element => {
 
-  const { logOut } = useAuth();
+  const { logOut, auth } = useAuth();
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export const MenuProfile = ({setMenu, imgRef}: MenuProfileProps): JSX.Element =>
 
   return (
     <NavStyle ref={menuRef}>
-      <Link to='/profile'>Perfil</Link>
+      <Link to={`/${auth.username ?? auth.name.replace(" ", "-") + "-" + auth.id}`}>Perfil</Link>
       <Link to='/settings'>Editar Perfil</Link>
       <button aria-label='logout' type='button' onClick={logOut}>Cerrar Sesión</button>
     </NavStyle>

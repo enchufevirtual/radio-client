@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import {
   ContainerProfile,
@@ -12,25 +13,37 @@ import {
 import { Social } from '../../components/profile/Social';
 import { formatDate } from '../../helpers/formatDate';
 import { useGlobal } from '../../hooks/useGlobal';
+import { useUser } from '../../hooks/useUser';
+import { NotFound } from '../NotFound';
 
 export const Profile = () => {
 
-  const { auth } = useAuth();
+  const { username } = useParams();
+  const { profile, auth } = useAuth();
   const { setIsFooter } = useGlobal();
 
-  const { name, description, createAt, image} = auth;
+  const { handleUser, userId, userExists } = useUser()
+
+  const { name, description, createAt, image} = profile;
+
   const url = `${image
     ? `${process.env.BACKEND_URL}/${image}`
-    : `https://api.multiavatar.com/${name}.svg`}`
+    : `https://api.multiavatar.com/${name.trim()}.svg`}`
 
-  const socialmedia = auth.social
-  ? Object.entries(auth.social)
+  const socialmedia = profile.social
+  ? Object.entries(profile.social)
       .filter(([key, value]) => key !== "createAt" &&
         key !== "id" &&
         key !== "userId" &&
         value !== null
       ).map(([key, value]) => <Social key={key} property={key} value={value} />)
   : null;
+
+  useEffect(() => {
+    handleUser(username)
+  }, [username])
+
+  if (!userExists) return <NotFound />
 
   return (
     <ContainerProfile onLoad={() => setIsFooter(true)}>
@@ -39,7 +52,7 @@ export const Profile = () => {
         <ContainerName>
           <span>{name}</span>
         </ContainerName>
-        <ButtonEditProfile to='/settings/profile'>Editar Perfil</ButtonEditProfile>
+        {auth.id === userId && <ButtonEditProfile to='/settings/profile'>Editar Perfil</ButtonEditProfile>}
       </ContainerImage>
       <ContainerAbout>
         <h3>Acerca de {name}:</h3>

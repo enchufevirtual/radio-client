@@ -7,10 +7,12 @@ import { LoginChat } from './LoginChat';
 import { LoadingChat } from '../loadings/LoadingChat';
 import { useSocket } from '../../hooks/useSocket';
 import { useGlobal } from '../../hooks/useGlobal';
+import { useUser } from '../../hooks/useUser';
 
 export const Chat = () => {
 
   const { closeLoginChat, menuNav, inputRef } = useGlobal();
+  const { handleUser } = useUser();
   const [openEmoji, setOpenEmoji] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
 
@@ -76,22 +78,22 @@ export const Chat = () => {
       { loadingChat && <LoadingChat /> }
       <ContainerMessages ref={containerRef} className="container">
       { messages.map((message, index) => {
-        let color = userColors[message.from];
+        let color = userColors[message.name];
         let imageUser = `${message.image
           ? `${url}/${message.image}`
-          : `${api}/${message.from}.png?apikey=${key}`}`
+          : `${api}/${message.name}.png?apikey=${key}`}`
         if (!color) {
           color = randomColor();
           setUserColors(prevUserColors => ({
             ...prevUserColors,
-            [message.from]: color
+            [message.name]: color
           }));
         }
         return (
           <ContainerUserChat key={index} ref={index === messages.length - 1 ? lastMessageRef : null}>
-            <img src={imageUser} alt="User Image" />
+            <img onClick={() => handleUser(`${message.userId}`)} src={imageUser} alt="User Image" />
             <BodyMessage>
-              <h4 style={{ color }}>{message.from}<small>:</small></h4>{message.body}
+              <h4 onClick={() => handleUser(`${message.userId}`)} style={{ color }}>{message.from ?? message.name}<small>:</small></h4>{message.body}
             </BodyMessage>
           </ContainerUserChat>
         );

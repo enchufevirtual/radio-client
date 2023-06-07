@@ -21,7 +21,7 @@ export const SettingsProfile = (): JSX.Element => {
 
   const { profile, onChange, onChangeSocial, handleFile, handleSubmit, previewImage } = useSettingsProfile();
   const { success } = useAuth();
-  const { name, description, email, social, image } = profile;
+  const { name, username, description, email, social, image } = profile;
 
   const api = process.env.API_AVATAR;
   const key = process.env.API_KEY;
@@ -48,6 +48,19 @@ export const SettingsProfile = (): JSX.Element => {
                 onChange={onChange}
               />
               <AlertMessage data={{id: 'name'}} />
+            </GroupInput>
+            <GroupInput>
+              <Label htmlFor="username">Nombre de usuario</Label>
+              <p>radio.enchufevirtual.com/{username}</p>
+              <br/>
+              <SettingsInput
+                type="text"
+                id='username'
+                name='username'
+                value={username !== 'null' ? username : ''}
+                onChange={onChange}
+              />
+              <AlertMessage data={{id: 'username'}} />
             </GroupInput>
             <GroupInput>
               <Label htmlFor="description">Descripción</Label>
@@ -130,6 +143,7 @@ export const SettingsProfile = (): JSX.Element => {
               accept="image/png, image/gif, image/jpeg, image/jpg"
               onChange={handleFile}
             />
+            <AlertMessage data={{id: 'image-alert'}} />
             <p>El formato debe ser JPEG, PNG o GIF y no puede superar los 2 MB.</p>
           </ContainerImage>
         </ContainerInputs>

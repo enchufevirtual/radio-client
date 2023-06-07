@@ -12,6 +12,7 @@ export function useSettingsProfile() {
     id: "",
     createAt: "",
     name: "",
+    username: "",
     email: "",
     description: "",
     image: '',
@@ -67,12 +68,17 @@ export function useSettingsProfile() {
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
-    const { name, email } = profile;
+    const { name, email, username } = profile;
 
     if (!name.trim()) {
       return messageNotification('name', 'El nombre es obligatorio');
     } else if (!regexName(name)) {
       return messageNotification('name', 'El campo "Nombre" solo acepta letras y espacios.');
+    }
+    if (username) {
+      if (!regexUsername(username)) {
+        return messageNotification('username', 'Contiene caracteres que no son válidos..');
+      }
     }
     if (!email.trim()) {
       return messageNotification('email', 'Este campo no puede ir vacío');
@@ -86,6 +92,9 @@ export function useSettingsProfile() {
   const regexName = (name: string): boolean => {
     return /^[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s]+$/.test(name);
   }
+  const regexUsername = (username: string) => {
+    return /^[A-Za-z0-9]+$/.test(username);
+  };
   const isEmail = (email: string): boolean => {
     return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email);
   }
