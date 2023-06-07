@@ -72,19 +72,29 @@ export function useSettingsProfile() {
     const { name, email, username } = profile;
 
     if (!name.trim()) {
-      return messageNotification('name', 'El nombre es obligatorio');
+      messageNotification('name', 'El nombre es obligatorio');
+      messageNotification('send', '');
+      return;
     } else if (!regexName(name)) {
-      return messageNotification('name', 'El campo "Nombre" solo acepta letras y espacios.');
+      messageNotification('name', 'El campo "Nombre" solo acepta letras y espacios.');
+      messageNotification('send', '');
+      return;
     }
     if (username) {
       if (!regexUsername(username)) {
-        return messageNotification('username', 'Contiene caracteres que no son válidos..');
+        messageNotification('username', 'Contiene caracteres que no son válidos..');
+        messageNotification('send', '');
+        return;
       }
     }
     if (!email.trim()) {
-      return messageNotification('email', 'Este campo no puede ir vacío');
+      messageNotification('email', 'Este campo no puede ir vacío');
+      messageNotification('send', '');
+      return;
     } else if (!isEmail(email)) {
-      return messageNotification('email', 'El campo "Email" contiene un formato no válido.');
+      messageNotification('email', 'El campo "Email" contiene un formato no válido.');
+      messageNotification('send', '');
+      return;
     }
     updateProfile(profile);
     if (!isUpdating) return

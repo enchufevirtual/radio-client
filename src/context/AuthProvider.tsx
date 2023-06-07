@@ -89,7 +89,9 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
 
     const { name, username, description, email, social, image, id } = updateData;
     const descriptionString = description !== null ? description : '';
-    const usernameString = username !== null ? username : '';
+    const usernameString = username !== null ? username.trim() : '';
+    const nameString = name !== null && name.trim();
+    const emailString = email !== null && email.trim();
 
     const token = localStorage.getItem('token_ev');
     if (!token) {
@@ -106,9 +108,9 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
     try {
       setLoadingPage(true)
       const formData = new FormData();
-      formData.append('name', name);
+      formData.append('name', nameString);
       formData.append('username', usernameString);
-      formData.append('email', email);
+      formData.append('email', emailString);
       formData.append('description', descriptionString);
       formData.append('social', JSON.stringify(social));
       formData.append('image', image);
