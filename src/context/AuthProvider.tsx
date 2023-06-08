@@ -63,6 +63,9 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       } else {
         setInvalidToken('');
       }
+      if (message === 'No tienes los permisos') {
+        localStorage.removeItem('token_ev');
+      }
       setAuth(null);
       setProfile(null);
     }

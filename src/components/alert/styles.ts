@@ -1,4 +1,4 @@
-import { DetailedHTMLProps, HTMLAttributes } from 'react';
+import type { DetailedHTMLProps, HTMLAttributes } from 'react';
 import styled, { css } from "styled-components";
 import { DEFAULT_BLUE, WARNINGS } from "../../styles/constants";
 
