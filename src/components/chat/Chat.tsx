@@ -74,7 +74,7 @@ export const Chat = () => {
   };
 
   return (
-    <ChatStyle style={{zIndex: menuNav ? 7 : 10}}>
+    <ChatStyle style={{zIndex: menuNav ? 8 : 11}}>
       { loadingChat && <LoadingChat /> }
       <ContainerMessages ref={containerRef} className="container">
       { messages.map((message, index) => {

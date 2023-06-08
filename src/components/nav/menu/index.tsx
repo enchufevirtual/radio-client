@@ -29,8 +29,16 @@ export const MenuProfile = ({setMenu, imgRef}: MenuProfileProps): JSX.Element =>
 
   return (
     <NavStyle ref={menuRef}>
-      <Link to={`/${auth.username ?? auth.name.replace(" ", "-") + "-" + auth.id}`}>Perfil</Link>
-      <Link to='/settings'>Editar Perfil</Link>
+      <Link
+        to={`/${auth.username ?? auth.name.replace(" ", "-") + "-" + auth.id}`}
+      >
+        Perfil
+      </Link>
+      <Link
+        to='/settings'
+      >
+        Editar Perfil
+      </Link>
       <button aria-label='logout' type='button' onClick={logOut}>Cerrar Sesión</button>
     </NavStyle>
   )

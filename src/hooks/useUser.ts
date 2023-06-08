@@ -13,11 +13,11 @@ export function useUser() {
 
   const match = useMediaQuery('(min-width: 768px)')
 
-  const { setOpenChat } = useGlobal();
+  const { setOpenChat, setZIndexLoading } = useGlobal();
   const { setProfile, setLoadingPage } = useAuth();
 
   async function handleUser(username: string): Promise<void> {
-
+    setZIndexLoading(8);
     const token = localStorage.getItem('token_ev');
 
     if (!token) {

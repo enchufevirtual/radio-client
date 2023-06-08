@@ -42,7 +42,9 @@ export type ContextProps = {
   closeLoginChat: boolean,
   setMenuNav: React.Dispatch<React.SetStateAction<boolean>>;
   menuNav: boolean,
-  inputRef: RefObject<HTMLTextAreaElement>
+  inputRef: RefObject<HTMLTextAreaElement>,
+  setZIndexLoading: React.Dispatch<React.SetStateAction<number>>;
+  zIndexLoading: number
 }
 
 // AuthProvider

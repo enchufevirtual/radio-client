@@ -11,7 +11,7 @@ export const Radio = styled.div`
   border-radius: 6px;
   width: 450px;
   height: 70px;
-  z-index: 11;
+  z-index: 12;
   overflow: hidden;
   user-select: none;
 

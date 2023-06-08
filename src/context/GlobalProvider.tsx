@@ -25,6 +25,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   const [play, setPlay] = useState(false);
   // Textarea Ref Chat
   const inputRef = useRef(null);
+  // Z INDEX Loading
+  const [zIndexLoading, setZIndexLoading] = useState(11);
 
   class CheckBeforeSend {
 
@@ -188,6 +190,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   // Chat
   const handleChat = () => {
     setOpenChat(!openChat);
+    const zIndex = openChat && 7;
+    setZIndexLoading(zIndex);
     setCloseLoginChat(true);
   }
 
@@ -219,7 +223,9 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     closeLoginChat,
     setMenuNav,
     menuNav,
-    inputRef
+    inputRef,
+    setZIndexLoading,
+    zIndexLoading
   }
 
   const value = {

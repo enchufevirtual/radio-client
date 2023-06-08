@@ -1,12 +1,24 @@
-import styled from "styled-components";
+import type { DetailedHTMLProps, HTMLAttributes } from 'react';
+import styled, { css } from "styled-components";
+import { useGlobal } from '../../hooks/useGlobal';
 
-export const LoadingStyles = styled.div`
+interface LoadingProps extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+  zIndex?: number;
+}
+
+export const LoadingStyles = styled.div<LoadingProps>`
   display: flex;
   justify-content: center;
   align-items: center;
   position: fixed;
   background-color: #161B22;
-  z-index: 9;
+  z-index: 11;
+  ${({zIndex}) =>
+  zIndex &&
+  css`
+    z-index: ${zIndex};
+  `
+  }
   top: 0;
   bottom: 0;
   left: 0;
