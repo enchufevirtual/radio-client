@@ -144,7 +144,7 @@ export const SettingsProfile = (): JSX.Element => {
               onChange={handleFile}
             />
             <AlertMessage data={{id: 'image-alert'}} />
-            <p>El formato debe ser JPEG, PNG o GIF y no puede superar los 2 MB.</p>
+            <p>El formato debe ser JPEG, PNG o GIF y no puede superar los 10 MB.</p>
           </ContainerImage>
         </ContainerInputs>
         <SettingsButton aria-label='update' type='submit'>Actualizar Perfil</SettingsButton>
