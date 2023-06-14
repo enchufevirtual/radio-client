@@ -38,7 +38,6 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
   async function authUser() {
     const token = localStorage.getItem('token_ev')
     if (!token) {
-      setLoading(false);
       setLoadingPage(false);
       return;
     };
@@ -58,13 +57,10 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       const { message } = (error as ErrorResponse).response.data;
       if (message === 'Invalid Token') {
         localStorage.removeItem('token_ev');
+        location.href = '/'
         setInvalidToken(message);
-        setLoadingPage(false);
       } else {
         setInvalidToken('');
-      }
-      if (message === 'No tienes los permisos') {
-        localStorage.removeItem('token_ev');
       }
       setAuth(null);
       setProfile(null);
