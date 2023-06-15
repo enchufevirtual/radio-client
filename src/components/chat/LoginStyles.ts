@@ -88,6 +88,7 @@ export const GroupButtons = styled.div`
     text-decoration: none;
     width: fit-content !important;
     ${css`${CssButton}`}
+    font-size: 84%;
 
     @media (max-width: 310px) {
       width: 100% !important;
@@ -96,6 +97,7 @@ export const GroupButtons = styled.div`
 
   button {
     ${css`${CssStyleButtons}`}
+    font-size: 84%;
   }
   @media (max-width: 310px) {
     flex-direction: column;
