@@ -27,6 +27,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   const inputRef = useRef(null);
   // Z INDEX Loading
   const [zIndexLoading, setZIndexLoading] = useState(11);
+  // Current Song
+  const [currentSong, setCurrentSong] = useState('');
 
   class CheckBeforeSend {
 
@@ -162,8 +164,25 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   let audioRef = useRef<null | HTMLMediaElement>(null);
   let isPlaying = false;
 
-  const onPlay = (): void => {
+  useEffect(() => {
+
+    const getCurrentSong = async () => {
+      try {
+        const { data } = await clientAxios('/zeno');
+        setCurrentSong(data.title)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    getCurrentSong();
+
+    const interval = setInterval(getCurrentSong, 5000);
+    return () => clearInterval(interval);
+  }, [])
+
+  const onPlay = async () => {
     const audio = audioRef.current;
+
     audio?.play();
     setPlay(true);
     isPlaying = true;
@@ -202,6 +221,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     setVolumeValue,
     play,
     toggleAudio,
+    currentSong
   }
 
   const register = {

@@ -44,7 +44,8 @@ export type ContextProps = {
   menuNav: boolean,
   inputRef: RefObject<HTMLTextAreaElement>,
   setZIndexLoading: React.Dispatch<React.SetStateAction<number>>;
-  zIndexLoading: number
+  zIndexLoading: number,
+  currentSong: string
 }
 
 // AuthProvider

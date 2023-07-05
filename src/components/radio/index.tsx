@@ -9,7 +9,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 export const Radio = () => {
 
-  const { toggleAudio, play, audioRef, openChat, handleChat } = useGlobal();
+  const { toggleAudio, play, audioRef, openChat, handleChat, currentSong } = useGlobal();
 
   const [openVolume, setOpenVolume] = useState(false);
   const [mouseOver, setMouseOver] = useState(false);
@@ -44,6 +44,10 @@ export const Radio = () => {
     };
   }, []);
 
+  const handleEnded = () => {
+    console.log("musica finalizada")
+  }
+
   return (
     <RadioStyle className="Radio">
       <DjRadioDetails>
@@ -51,12 +55,12 @@ export const Radio = () => {
         <AdminDetails>
           <h2>Radio Ev</h2>
           <MarqueeContainer>
-            <MarqueeText ref={textRef}>Tu nueva experiencia musical</MarqueeText>
+            <MarqueeText ref={textRef}>{currentSong}</MarqueeText>
           </MarqueeContainer>
         </AdminDetails>
       </DjRadioDetails>
       <audio ref={audioRef}>
-          <source src="https://stream.zeno.fm/ezj7hvwkfk2tv" type="audio/mpeg" />
+        <source onEnded={handleEnded} src="https://stream.zeno.fm/ezj7hvwkfk2tv" type="audio/mpeg" />
       </audio>
       <ContainerPlayVolume className='box'>
         <PlayPause aria-label='PlayPause' type='button' onClick={() => toggleAudio()}>
