@@ -29,6 +29,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   const [zIndexLoading, setZIndexLoading] = useState(11);
   // Current Song
   const [currentSong, setCurrentSong] = useState('');
+  // IsPlaying
+  const [isPlaying, setIsPLaying] = useState(false);
 
   class CheckBeforeSend {
 
@@ -162,7 +164,6 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
 
   // Config Radio Ev
   let audioRef = useRef<null | HTMLMediaElement>(null);
-  let isPlaying = false;
 
   useEffect(() => {
 
@@ -183,15 +184,16 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   const onPlay = async () => {
     const audio = audioRef.current;
 
+    audio?.load();
     audio?.play();
     setPlay(true);
-    isPlaying = true;
+    setIsPLaying(true);
   }
   const onPause = (): void => {
     const audio = audioRef.current;
     audio?.pause();
     setPlay(false);
-    isPlaying = false;
+    setIsPLaying(false);
   }
   const toggleAudio = async (): Promise<void>  => {
     const audio = audioRef.current;
