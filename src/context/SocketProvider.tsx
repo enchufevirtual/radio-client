@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import type { FormEventHandler } from 'react';
 import io from 'socket.io-client';
 import { SocketContext } from "./SocketContext";
+import { ErrorRequest } from "types/types";
 import { clientAxios } from "../config/axios";
 import { GlobalProviderTypes, Messages } from "./types";
 import { useAuth } from "../hooks/useAuth";
@@ -30,18 +31,32 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
   const containerRef = useRef(null);
 
   // Socket Fetch
+
+  const testBackendURL = async (url: string) => {
+    try {
+      await fetch(url); // We try to make a request to the backend url
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
   useEffect(() => {
     const fetchBackendURL = async () => {
+      const isValidURL = await testBackendURL(process.env.BACKEND_URL);
+      if (!isValidURL) return; // We exit the function if the URL is invalid
+
       try {
-        const socketInstance = io(process.env.BACKEND_URL, {transports: ["websocket"]});
+        const socketInstance = io(process.env.BACKEND_URL, { transports: ["websocket"] });
         setSocket(socketInstance);
       } catch (error) {
-        console.log(error)
+        console.error("Error al conectarse:", error);
       }
     };
 
     fetchBackendURL();
   }, []);
+
 
   // Socket Chat
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
@@ -54,6 +69,7 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
       return;
     };
     if (invalidToken === 'Invalid Token') {
+      localStorage.removeItem("token_ev");
       setAllowed(false);
       return;
     }
@@ -115,6 +131,11 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
         }));
         setMessages(prevMessages => [...prevMessages, ...newMessages]);
       } catch (error) {
+        const errorMsg = (error as ErrorRequest)
+        if (errorMsg.message === "Network Error") {
+          localStorage.removeItem("token_ev");
+          return;
+        }
         messageNotification('server', 'Hubo un error, recarga la página')
       } finally {
         setLoadingChat(false);

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import type {  FormEventHandler, ChangeEventHandler } from 'react';
 import { GlobalProviderTypes, RegisterForm } from "./types";
 import { GlobalContext } from "./GlobalContext";
-import { ErrorResponse } from "types/types";
+import { ErrorResponse, ErrorRequest } from "types/types";
 import { clientAxios } from "../config/axios";
 
 const initialState = {
@@ -28,9 +28,11 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   // Z INDEX Loading
   const [zIndexLoading, setZIndexLoading] = useState(11);
   // Current Song
-  const [currentSong, setCurrentSong] = useState('');
+  const [currentSong, setCurrentSong] = useState('Tu nueva experiencia musical');
   // IsPlaying
   const [isPlaying, setIsPLaying] = useState(false);
+  // No Request Zeno API
+  const [zenoAPI, setZenoAPI] = useState(false);
 
   class CheckBeforeSend {
 
@@ -127,7 +129,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
           image: ''
         })
       } catch (error) {
-        console.log(error)
+
         const { message } = (error as ErrorResponse).response.data;
         if (message == 'Este correo ya está registrado') {
           CheckBeforeSend.messageNotification('email', message)
@@ -166,20 +168,29 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   let audioRef = useRef<null | HTMLMediaElement>(null);
 
   useEffect(() => {
+    let interval: NodeJS.Timeout;
 
     const getCurrentSong = async () => {
       try {
         const { data } = await clientAxios('/zeno');
-        setCurrentSong(data.title)
+        setCurrentSong(data.title);
+        setZenoAPI(false);
       } catch (error) {
-        console.log(error)
-      }
-    }
-    getCurrentSong();
+        const errorMsg = error as ErrorRequest;
 
-    const interval = setInterval(getCurrentSong, 5000);
+        if (errorMsg.message === "Network Error") {
+          localStorage.removeItem("token_ev");
+          setZenoAPI(true);
+        }
+      }
+    };
+
+    if (!zenoAPI) {
+      interval = setInterval(getCurrentSong, 5000);
+    }
+
     return () => clearInterval(interval);
-  }, [])
+  }, [zenoAPI]);
 
   const onPlay = async () => {
     const audio = audioRef.current;

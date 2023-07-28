@@ -3,7 +3,7 @@ import { AuthContext } from "./AuthContext";
 import { clientAxios } from "../config/axios";
 import { GlobalProviderTypes, Auth } from "./types";
 import { useGlobal } from "../hooks/useGlobal";
-import { ErrorResponse, Data } from "../../types/types";
+import { ErrorResponse, Data, ErrorRequest } from "../../types/types";
 
 export const AuthProvider = ({children}: GlobalProviderTypes) => {
 
@@ -54,6 +54,11 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       setProfile(data);
       setLoadingPage(false)
     } catch (error) {
+      const errorMsg = error as ErrorRequest;
+      if (errorMsg.message === "Network Error") {
+        localStorage.removeItem("token_ev");
+        return;
+      }
       const { message } = (error as ErrorResponse).response.data;
       if (message === 'Invalid Token') {
         localStorage.removeItem('token_ev');

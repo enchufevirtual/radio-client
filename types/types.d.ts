@@ -6,6 +6,10 @@ export interface ErrorResponse {
   };
 }
 
+export interface ErrorRequest {
+  message: string;
+}
+
 export interface Data {
   password: string,
   new_password: string
