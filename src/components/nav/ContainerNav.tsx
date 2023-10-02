@@ -4,6 +4,7 @@ import { ContainerStyle } from './styles';
 import { useAuth } from '../../hooks/useAuth';
 import { useGlobal } from '../../hooks/useGlobal';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { MENU_NAV } from '../../../src/context/constants';
 
 const ContainerNav = (): JSX.Element => {
 
@@ -11,7 +12,7 @@ const ContainerNav = (): JSX.Element => {
 
   const { auth } = useAuth();
   const { image, name } = auth;
-  const { setMenuNav, menuNav } = useGlobal();
+  const { dispatch, menuNav } = useGlobal();
   const imgRef = useRef(null);
   const truncatedName = name.length > 10 ? name.slice(0, 10) + '...' : name;
 
@@ -22,11 +23,15 @@ const ContainerNav = (): JSX.Element => {
     ? `${process.env.BACKEND_URL}/${image}`
     : `${api}/${name}.png?apikey=${key}`}`
 
+  const handleMenu = () => {
+    dispatch({type: MENU_NAV, payload: !menuNav});
+  }
+
   return (
     <ContainerStyle>
       { !matches ? <p>Bienvenid@, {truncatedName}</p> : null }
-      <img ref={imgRef} onClick={() => setMenuNav(!menuNav)} src={url} alt="user" />
-      { menuNav && <MenuProfile setMenu={setMenuNav} imgRef={imgRef} /> }
+      <img ref={imgRef} onClick={handleMenu} src={url} alt="user" />
+      { menuNav && <MenuProfile imgRef={imgRef} /> }
     </ContainerStyle>
   )
 }

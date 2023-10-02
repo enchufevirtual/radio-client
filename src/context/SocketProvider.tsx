@@ -8,11 +8,12 @@ import { GlobalProviderTypes, Messages } from "./types";
 import { useAuth } from "../hooks/useAuth";
 import { useGlobal } from "../hooks/useGlobal";
 import { DataServer } from "../components/chat/types";
+import { CLOSE_LOGIN_CHAT } from "./constants";
 
 export const SocketProvider = ({children}: GlobalProviderTypes) => {
 
   const { auth, invalidToken } = useAuth();
-  const { messageNotification, setCloseLoginChat, inputRef } = useGlobal();
+  const { messageNotification, dispatch, inputRef } = useGlobal();
   const [socket, setSocket] = useState(null);
 
   const [isInputEmpty, setIsInputEmpty] = useState(false);
@@ -65,7 +66,7 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
     const token = localStorage.getItem('token_ev');
     if (!token) {
       setAllowed(false);
-      setCloseLoginChat(false)
+      dispatch({type: CLOSE_LOGIN_CHAT, payload: false})
       return;
     };
     if (invalidToken === 'Invalid Token') {

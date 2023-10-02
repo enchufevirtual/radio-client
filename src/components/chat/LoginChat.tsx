@@ -7,17 +7,22 @@ import { AlertMessage } from '../alert';
 import { useGlobal } from '../../hooks/useGlobal';
 import Close from '../../public/assets/close.svg';
 import { useDraggable } from '../../hooks/useDraggable';
+import { CLOSE_LOGIN_CHAT } from '../../../src/context/constants';
 
 export const LoginChat = () => {
 
   const { email, password, setEmail, setPassword, handleLogin } = useLoginChat();
-  const { setCloseLoginChat } = useGlobal();
+  const { dispatch } = useGlobal();
   const dragLoginChat = useRef(null);
   useDraggable(dragLoginChat, 'DraggableLoginChat');
 
+  const setCloseLoginChat = () => {
+    dispatch({type: CLOSE_LOGIN_CHAT, payload: true})
+  }
+
   return (
     <ContainerLogin ref={dragLoginChat}>
-      <ImageClose onClick={() => setCloseLoginChat(true)} src={Close} alt="Close Login" />
+      <ImageClose onClick={setCloseLoginChat} src={Close} alt="Close Login" />
       <div className='DraggableLoginChat'></div>
       <GroupInput className='LoginChat'>
         <Label>Iniciar sesión</Label>

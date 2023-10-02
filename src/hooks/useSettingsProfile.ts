@@ -27,8 +27,7 @@ export function useSettingsProfile() {
 
   const [profile, setProfile] = useState<Auth>(initialState);
   const { auth, updateProfile, isUpdating } = useAuth();
-  const [previewImage, setPreviewImage] = useState(null);
-  const { messageNotification } = useGlobal();
+  const { messageNotification,  } = useGlobal();
 
   const onChange: InputChangeEvent = (event) => {
     let { name, value } = event.target;
@@ -45,21 +44,6 @@ export function useSettingsProfile() {
       const social = { ...profile.social, [name.split('.')[1]]: value };
       setProfile({ ...profile, social });
     }
-  }
-
-  const handleFile: ChangeEventHandler<HTMLInputElement> = event => {
-    const { name, files } = event.target;
-    if (files && files[0]) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPreviewImage(reader.result as string);
-      }
-      reader.readAsDataURL(files[0]);
-    }
-    setProfile({
-      ...profile,
-      [name]: files && files[0] ? files[0] : ''
-    })
   }
 
   useEffect(() => {
@@ -113,9 +97,7 @@ export function useSettingsProfile() {
   return {
     onChange,
     onChangeSocial,
-    handleFile,
     handleSubmit,
-    previewImage,
     profile,
     setProfile
   }

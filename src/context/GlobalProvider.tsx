@@ -1,64 +1,86 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useReducer } from "react";
 import type {  FormEventHandler, ChangeEventHandler } from 'react';
-import { GlobalProviderTypes, RegisterForm } from "./types";
+import { GlobalProviderTypes, Auth, HandleFileCallback, MyPostTypes, GLOBAL_STATE } from "./types";
 import { GlobalContext } from "./GlobalContext";
 import { ErrorResponse, ErrorRequest } from "types/types";
 import { clientAxios } from "../config/axios";
-
-const initialState = {
-  name: '',
-  email: '',
-  password: '',
-  repeatPassword: '',
-  image: ''
-}
+import { globalReducer } from "./globalReducer";
+import {
+  CURRENT_AUDIO,
+  INPUT,
+  SUCCESS,
+  IS_FOOTER,
+  VOLUME_VALUE,
+  OPEN_CHAT,
+  CLOSE_LOGIN_CHAT,
+  MENU_NAV,
+  PREVIEW_IMAGE,
+  PREVIEW_AUDIO,
+  PLAY,
+  ZINDEX_LOADING,
+  CURRENT_SONG,
+  IS_PLAYING,
+  ZENO_API,
+  INPUT_PAYLOAD,
+  INPUT_FILES
+} from "./constants";
 
 export const GlobalProvider = ({children}: GlobalProviderTypes) => {
-  const [input, setInput] = useState<RegisterForm>(initialState);
-  const [success, setSuccess] = useState(false);
-  const [isFooter, setIsFooter] = useState(true);
-  const [volumeValue, setVolumeValue] = useState(70);
-  const [openChat, setOpenChat] = useState(false);
-  const [closeLoginChat, setCloseLoginChat] = useState(false);
-  const [menuNav, setMenuNav] = useState(false);
-  // Audio Player
-  const [play, setPlay] = useState(false);
+
+  const initialState: GLOBAL_STATE = {
+    currentAudio: null as null,
+    input: {
+      username: '',
+      email: '',
+      password: '',
+      repeatPassword: '',
+      image: ''
+    },
+    success: false,
+    isFooter: true,
+    volumeValue: 70,
+    openChat: false,
+    closeLoginChat: false,
+    menuNav: false,
+    previewImage: null as null,
+    previewAudio: {name: "", size: 0},
+    zIndexLoading: 11,
+    currentSong: 'Tu nueva experiencia musical',
+    play: false,
+    isPlaying: false,
+    zenoAPI: false,
+  }
+
+  const [state, dispatch] = useReducer(globalReducer, initialState);
+
   // Textarea Ref Chat
   const inputRef = useRef(null);
-  // Z INDEX Loading
-  const [zIndexLoading, setZIndexLoading] = useState(11);
-  // Current Song
-  const [currentSong, setCurrentSong] = useState('Tu nueva experiencia musical');
-  // IsPlaying
-  const [isPlaying, setIsPLaying] = useState(false);
-  // No Request Zeno API
-  const [zenoAPI, setZenoAPI] = useState(false);
 
   class CheckBeforeSend {
 
-    private name: string;
+    private username: string;
     private email: string;
     private password: string;
     private repeatPassword: string
 
-    constructor(name: string, email: string, password: string, repeatPassword: string) {
-      this.name = name;
+    constructor(username: string, email: string, password: string, repeatPassword: string) {
+      this.username = username;
       this.email = email;
       this.password = password;
       this.repeatPassword = repeatPassword
     }
     protected validate() {
-      const nameValue = this.name.trim();
+      const usernameValue = this.username.trim();
       const emailValue = this.email.trim();
       const passwordValue = this.password.trim();
       const repeatPasswordValue = this.repeatPassword.trim();
       let result = true;
 
-      if (!nameValue) {
-        CheckBeforeSend.messageNotification('name', 'El nombre es obligatorio');
+      if (!usernameValue) {
+        CheckBeforeSend.messageNotification('username', 'El username es obligatorio');
         result = false;
-      } else if (!this.regexName(nameValue)) {
-        CheckBeforeSend.messageNotification('name', 'El campo "Nombre" solo acepta letras, números y espacios.');
+      } else if (!this.regexUsername(usernameValue)) {
+        CheckBeforeSend.messageNotification('username', 'Solo puedes agregar letras y números');
         result = false;
       }
       if (!emailValue) {
@@ -98,39 +120,36 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         icon.classList.remove('fas', 'fa-exclamation')
       }
     }
-    private regexName(name: string): boolean {
-      return /^[A-Za-z0-9ÑñÁáÉéÍíÓóÚúÜü\s]+$/.test(name);
+    private regexUsername(username: string): boolean {
+      return /^[A-Za-z0-9]+$/.test(username);
     }
     private isEmail(email: string): boolean {
       return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email);
     }
     public onSubmit: FormEventHandler<HTMLFormElement> | undefined = async (event) =>  {
       event.preventDefault();
-      const {name, email, password, image} = input;
+      const {username, email, password, image} = state.input;
 
       if (!this.validate()) return;
 
       try {
 
         const formData = new FormData();
-        formData.append('name', name.trim());
+        formData.append('username', username.trim());
         formData.append('email', email.trim());
         formData.append('password', password.trim());
         formData.append('image', image);
 
         await clientAxios.post('/users', formData);
-        setSuccess(true);
+        dispatch({type: SUCCESS})
         CheckBeforeSend.messageNotification('send', 'Revise su correo electrónico para activar su cuenta. ¡Gracias por registrarse!');
-        setInput({
-          name: '',
-          email: '',
-          password: '',
-          repeatPassword: '',
-          image: ''
-        })
+        dispatch({type: INPUT})
       } catch (error) {
 
         const { message } = (error as ErrorResponse).response.data;
+        if (message == `${this.username.toLowerCase()} ya está registrado`) {
+          CheckBeforeSend.messageNotification('username', message)
+        }
         if (message == 'Este correo ya está registrado') {
           CheckBeforeSend.messageNotification('email', message)
         }
@@ -146,23 +165,28 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     public onChange: ChangeEventHandler<HTMLInputElement> = (event) => {
       const { name, value } = event.target;
 
-      setInput({
-        ...input,
-        [name]: value
-      })
+      dispatch({
+        type: INPUT_PAYLOAD,
+        payload: {
+          ...state.input,
+          [name]: value
+        }
+      });
     }
     public handleFile: ChangeEventHandler<HTMLInputElement> = (event) => {
       const { name, files } = event.target;
 
-      setInput({
-        ...input,
-        [name]: files![0]
-      })
+      dispatch({
+        type: INPUT_FILES,
+        payload: {
+          ...state.input,
+          [name]: files![0]
+        }
+      });
     }
-
   }
-  const { name, email, password, repeatPassword } = input;
-  let check = new CheckBeforeSend(name, email, password, repeatPassword);
+  const { username, email, password, repeatPassword } = state.input;
+  let check = new CheckBeforeSend(username, email, password, repeatPassword);
 
   // Config Radio Ev
   let audioRef = useRef<null | HTMLMediaElement>(null);
@@ -173,92 +197,147 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     const getCurrentSong = async () => {
       try {
         const { data } = await clientAxios('/zeno');
-        setCurrentSong(data.title);
-        setZenoAPI(false);
+        dispatch({ type: CURRENT_SONG, payload: data.title })
+        dispatch({type: ZENO_API, payload: false});
       } catch (error) {
         const errorMsg = error as ErrorRequest;
 
         if (errorMsg.message === "Network Error") {
           localStorage.removeItem("token_ev");
-          setZenoAPI(true);
+          dispatch({type: ZENO_API, payload: true});
         }
       }
     };
 
-    if (!zenoAPI) {
+    if (!state.zenoAPI) {
       interval = setInterval(getCurrentSong, 5000);
     }
 
     return () => clearInterval(interval);
-  }, [zenoAPI]);
+  }, [state.zenoAPI]);
 
   const onPlay = async () => {
     const audio = audioRef.current;
-
     audio?.load();
     audio?.play();
-    setPlay(true);
-    setIsPLaying(true);
+    dispatch({type: PLAY, payload: true});
+    dispatch({type: IS_PLAYING, payload: true});
   }
   const onPause = (): void => {
     const audio = audioRef.current;
     audio?.pause();
-    setPlay(false);
-    setIsPLaying(false);
+    dispatch({type: PLAY, payload: false});
+    dispatch({type: IS_PLAYING, payload: false});
   }
-  const toggleAudio = async (): Promise<void>  => {
+  const toggleAudio = async (src: string): Promise<void> => {
     const audio = audioRef.current;
-    if(audio?.paused && !isPlaying) { return onPlay(); }
-    else { if(!audio?.paused) { return onPause(); } }
-  }
+
+    if (!src) {
+      if (audio.paused) {
+        onPlay();
+      } else {
+        onPause()
+      }
+      return;
+    }
+    if (!state.currentAudio || state.currentAudio !== src) {
+      audio.src = `${process.env.BACKEND_URL}/${src}`;
+      dispatch({type: CURRENT_AUDIO, payload: src});
+      onPlay();
+    } else {
+      if (audio.paused) {
+        onPlay();
+      } else {
+        onPause();
+      }
+    }
+  };
+
   const volume = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setVolumeValue(parseFloat(e.target.value))
+    dispatch({type: VOLUME_VALUE, payload: parseFloat(e.target.value)})
   }
   useEffect(() => {
     const audio = audioRef.current;
-    audio ? audio.volume = volumeValue / 100 : null;
-  }, [volumeValue, audioRef]);
+    audio ? audio.volume = state.volumeValue / 100 : null;
+  }, [state.volumeValue, audioRef]);
 
   // Chat
   const handleChat = () => {
-    setOpenChat(!openChat);
-    const zIndex = openChat && 7;
-    setZIndexLoading(zIndex);
-    setCloseLoginChat(true);
+    dispatch({type: OPEN_CHAT});
+    const zIndex = state.openChat && 7;
+    dispatch({type: ZINDEX_LOADING, payload: zIndex})
+    dispatch({type: CLOSE_LOGIN_CHAT});
   }
+
+  // Handle of all files
+  const handleFile: HandleFileCallback<Auth | MyPostTypes> = (
+    event,
+    cb,
+  ) => {
+    const { name, files } = event.target;
+    // Reset the value of the file input element
+
+    if (files && files[0]) {
+      const reader = new FileReader();
+      // Read audio and image files
+      reader.onload = ( { target } ) => {
+        if (files[0].type.startsWith('image/')) {
+          dispatch({type: PREVIEW_IMAGE, payload: target.result});
+        } else if (files[0].type.startsWith('audio/')) {
+          dispatch({
+            type: PREVIEW_AUDIO,
+            payload: {
+              name: files[0].name,
+              size: files[0].size
+            }
+          });
+        }
+      };
+      // We reset the value of the event when it finishes reading and the data is sent
+      reader.onloadend = () => event.target.value = '';
+      // Read the contents of the specified Blob or File
+      reader.readAsDataURL(files[0]);
+
+      cb((prev) => ({
+        ...prev,
+        [name]: files![0]
+      }));
+    }
+  };
 
   const radio = {
     audioRef,
     volume,
-    volumeValue,
-    setVolumeValue,
-    play,
+    volumeValue: state.volumeValue,
+    onPlay,
+    onPause,
+    isPlaying: state.isPlaying,
+    play: state.play,
     toggleAudio,
-    currentSong
+    currentSong: state.currentSong
   }
 
   const register = {
     check,
-    success,
-    name,
+    success: state.success,
+    username,
     email,
     password,
     messageNotification: CheckBeforeSend.messageNotification,
     repeatPassword,
   }
   const global = {
-    openChat,
-    setOpenChat,
+    dispatch,
+    openChat: state.openChat,
     handleChat,
-    setIsFooter,
-    isFooter,
-    setCloseLoginChat,
-    closeLoginChat,
-    setMenuNav,
-    menuNav,
+    isFooter: state.isFooter,
+    closeLoginChat: state.closeLoginChat,
+    menuNav: state.menuNav,
     inputRef,
-    setZIndexLoading,
-    zIndexLoading
+    handleFile,
+    zIndexLoading: state.zIndexLoading,
+    previewImage: state.previewImage,
+    previewAudio: state.previewAudio
   }
 
   const value = {

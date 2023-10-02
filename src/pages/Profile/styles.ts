@@ -1,25 +1,47 @@
 import { Link } from "react-router-dom";
 import styled, { css } from "styled-components";
-import { DEFAULT_NAV_COLOR } from "../../styles/constants";
+import { COLOR_CONTAINER } from "../../styles/constants";
 import { CssButton } from "../../styles/Form/styles";
 
 export const ContainerProfile = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 70px;
+  width: 900px;
+  max-width: 95%;
+
+  @media (max-width: 991px) {
+    grid-template-columns: 90%;
+    place-items: center;
+    place-content: center;
+    gap: 2rem
+  }
+`;
+export const ContainerInfoProfile= styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  max-width: 95%;
   gap: 1rem;
-  width: 90%;
-  max-width: 500px;
-  margin-top: 70px;
+  @media (max-width: 991px) {
+    width: 500px;
+  }
 `;
+export const ContainerPostProfile= styled.div`
+  display: flex;
+  margin-top: -70px;
+  align-self: flex-start;
+  @media (max-width: 991px) {
+    max-width: 95%;
+  }
+`;
+
 
 export const ContainerImage = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: ${DEFAULT_NAV_COLOR};
-  outline: rgb(48, 54, 61) solid 1px;
+  background-color: ${COLOR_CONTAINER};
   border-radius: 6px;
   padding: 1rem;
   gap: 10px;

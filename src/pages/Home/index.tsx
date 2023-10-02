@@ -1,23 +1,17 @@
 import React from 'react';
-import Hero from '../../components/home/Hero';
-import Description from '../../components/home/Description';
-import { ContainerHome } from './styles';
 import { useGlobal } from '../../hooks/useGlobal';
+import { IS_FOOTER } from '../../../src/context/constants';
+import { Posts } from '../Posts';
 
 export const Home = (): JSX.Element => {
 
-  const { setIsFooter, openChat } = useGlobal();
+  const { dispatch, openChat } = useGlobal();
+
+  const handleFooter = () => {
+    dispatch({type: IS_FOOTER, payload: false})
+  }
 
   return (
-    <div style={{overflowY: `${openChat ? 'hidden' : null}`}} onLoad={() => setIsFooter(false)}>
-      <Hero />
-      <ContainerHome>
-        <h1 >Radio <br/> Enchufe Virtual</h1>
-        <div className='full-width'>
-          <Description />
-
-        </div>
-      </ContainerHome>
-    </div>
+     <Posts allAllowedPost={true} />
   )
 }

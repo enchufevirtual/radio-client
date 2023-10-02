@@ -42,7 +42,7 @@ export const GlobalStyle = createGlobalStyle`
     height: 8px;
     position: relative;
     z-index: 10;
-    background-color: #f5f5f5;
+    background-color: transparent;
   }
   *::-webkit-scrollbar-button:vertical:increment {
     background-color: ${SCROLL_BG};
@@ -52,14 +52,10 @@ export const GlobalStyle = createGlobalStyle`
   }
   *::-webkit-scrollbar-track {
     background: #000;
-    position: relative;
-    z-index: 10;
   }
   *::-webkit-scrollbar-thumb {
     background-color: ${SCROLL_BG};
-    border-radius: 6px;
-    position: relative;
-    z-index: 10;
+    border-radius: 7px;
   }
   @media (max-width: 768px) {
     ::-webkit-scrollbar {display: none;}

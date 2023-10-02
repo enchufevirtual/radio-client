@@ -3,24 +3,28 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import {
   ContainerProfile,
+  ContainerInfoProfile,
   ContainerImage,
   ContainerName,
   ContainerAbout,
   ContainerSocial,
   AccountCreationDate,
-  ButtonEditProfile
+  ButtonEditProfile,
+  ContainerPostProfile
 } from './styles';
 import { Social } from '../../components/profile/Social';
 import { formatDate } from '../../helpers/formatDate';
 import { useGlobal } from '../../hooks/useGlobal';
 import { useUser } from '../../hooks/useUser';
 import { NotFound } from '../NotFound';
+import { IS_FOOTER } from '../../../src/context/constants';
+import { Posts } from '../Posts';
 
 export const Profile = () => {
 
   const { username } = useParams();
   const { profile, auth } = useAuth();
-  const { setIsFooter } = useGlobal();
+  const { dispatch } = useGlobal();
 
   const { handleUser, userId, userExists } = useUser()
 
@@ -43,29 +47,39 @@ export const Profile = () => {
     handleUser(username)
   }, [username])
 
+
+  const handleFooter = () => {
+    dispatch({type: IS_FOOTER, payload: true})
+  }
+
   if (!userExists) return <NotFound />
 
   return (
-    <ContainerProfile onLoad={() => setIsFooter(true)}>
-      <ContainerImage>
-        <img src={url} alt="Perfil" />
-        <ContainerName>
-          <span>{name}</span>
-        </ContainerName>
-        {auth.id === userId && <ButtonEditProfile to='/settings/profile'>Editar Perfil</ButtonEditProfile>}
-      </ContainerImage>
-      <ContainerAbout>
-        <h3>Acerca de {name}:</h3>
-        <p>{description == 'null' ? '' : description}</p>
-      </ContainerAbout>
-      <ContainerSocial>
-        <h4>Redes Sociales:</h4>
-        {socialmedia}
-      </ContainerSocial>
-      <AccountCreationDate>
-        <h4>Fecha de creación de la cuenta:</h4>
-        {formatDate(createAt)}
-      </AccountCreationDate>
+    <ContainerProfile onLoad={handleFooter}>
+      <ContainerInfoProfile>
+        <ContainerImage>
+          <img src={url} alt="Perfil" />
+          <ContainerName>
+            <span>{name}</span>
+          </ContainerName>
+          {auth.id === userId && <ButtonEditProfile to='/settings/profile'>Editar Perfil</ButtonEditProfile>}
+        </ContainerImage>
+        <ContainerAbout>
+          <h3>Acerca de {name}:</h3>
+          <p>{description == 'null' ? '' : description}</p>
+        </ContainerAbout>
+        <ContainerSocial>
+          <h4>Redes Sociales:</h4>
+          {socialmedia}
+        </ContainerSocial>
+        <AccountCreationDate>
+          <h4>Fecha de creación de la cuenta:</h4>
+          {formatDate(createAt)}
+        </AccountCreationDate>
+      </ContainerInfoProfile>
+      <ContainerPostProfile>
+        <Posts allAllowedPost={false} />
+      </ContainerPostProfile>
     </ContainerProfile>
   )
 }

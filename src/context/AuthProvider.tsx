@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { AuthContext } from "./AuthContext";
 import { clientAxios } from "../config/axios";
-import { GlobalProviderTypes, Auth } from "./types";
+import { GlobalProviderTypes, Auth, StateUpdater } from "./types";
 import { useGlobal } from "../hooks/useGlobal";
+import { useHandleState } from "../../src/hooks/useHandleState";
 import { ErrorResponse, Data, ErrorRequest } from "../../types/types";
 
 export const AuthProvider = ({children}: GlobalProviderTypes) => {
@@ -24,7 +25,7 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
     }
   }
 
-  const [auth, setAuth] = useState<Auth>(initialState);
+  const [auth, setAuth] = useHandleState<Auth>(initialState);
   const [profile, setProfile] = useState<Auth>(initialState);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);

@@ -5,6 +5,7 @@ import { ErrorResponse } from "types/types";
 import { clientAxios } from "../config/axios";
 import { useAuth } from "./useAuth";
 import { useMediaQuery } from "./useMediaQuery";
+import { ZINDEX_LOADING, OPEN_CHAT } from "../../src/context/constants";
 
 export function useUser() {
   const navigate = useNavigate()
@@ -13,11 +14,11 @@ export function useUser() {
 
   const match = useMediaQuery('(min-width: 768px)')
 
-  const { setOpenChat, setZIndexLoading } = useGlobal();
+  const { dispatch } = useGlobal();
   const { setProfile, setLoadingPage } = useAuth();
 
   async function handleUser(username: string): Promise<void> {
-    setZIndexLoading(8);
+    dispatch({type: ZINDEX_LOADING, payload: 8})
     const token = localStorage.getItem('token_ev');
 
     if (!token) {
@@ -55,7 +56,7 @@ export function useUser() {
       setUserExists(false);
     } finally {
       setLoadingPage(false);
-      if (!match) setOpenChat(false)
+      if (!match)  dispatch({type: OPEN_CHAT, payload: false})
     }
   }
   return {

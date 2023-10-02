@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { MouseEventHandler, RefObject, TouchEventHandler } from 'react';
 import { VolumeContainer, VolumeRange, BarHoverBox, Bar, BarFill } from './volumeStyle';
 import { useGlobal } from '../../hooks/useGlobal';
+import { VOLUME_VALUE } from '../../../src/context/constants';
 
 interface VolumeTypes {
   containerVolumeRef: RefObject<HTMLDivElement>
@@ -10,7 +11,7 @@ interface VolumeTypes {
 export const Volume = ({ containerVolumeRef }: VolumeTypes) => {
 
   const [isDragging, setIsDragging] = useState(false);
-  const { volume, volumeValue, setVolumeValue } = useGlobal();
+  const { volume, volumeValue, dispatch } = useGlobal();
 
   const calculateFillHeight = (offsetY: number, height: number) => {
     const calculatedHeight = Math.max(Math.min((height - offsetY) / height * 100, 100), 0);
@@ -19,7 +20,7 @@ export const Volume = ({ containerVolumeRef }: VolumeTypes) => {
 
   const updateValue = (offsetY: number, height: number) => {
     const fillHeight = calculateFillHeight(offsetY, height);
-    setVolumeValue(fillHeight);
+    dispatch({type: VOLUME_VALUE, payload: fillHeight})
   };
 
   const handleBarClick: MouseEventHandler<HTMLDivElement> = (e) => {

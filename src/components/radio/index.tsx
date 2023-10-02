@@ -6,10 +6,11 @@ import { ChatLogo } from './ChatLogo';
 import { VolumeLogo } from './VolumeLogo';
 import { Volume } from './Volume';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { PLAY } from '../../../src/context/constants';
 
 export const Radio = () => {
 
-  const { toggleAudio, play, audioRef, openChat, handleChat, currentSong } = useGlobal();
+  const { toggleAudio, play, audioRef, openChat, handleChat, currentSong, dispatch } = useGlobal();
 
   const [openVolume, setOpenVolume] = useState(false);
   const [mouseOver, setMouseOver] = useState(false);
@@ -18,10 +19,15 @@ export const Radio = () => {
   const containerVolumeRef = useRef(null);
 
   const match = useMediaQuery('(min-width: 991px)');
+  const urlStream = process.env.URL_STREAM;
 
   useEffect(() => {
     textRef.current.style.animationPlayState = 'running';
   }, []);
+
+  const handlePlay = () => {
+    dispatch({type: PLAY, payload: false})
+  }
 
   const handleOpenVolume = () => {
     setOpenVolume(!openVolume);
@@ -44,10 +50,6 @@ export const Radio = () => {
     };
   }, []);
 
-  const handleEnded = () => {
-    console.log("musica finalizada")
-  }
-
   return (
     <RadioStyle className="Radio">
       <DjRadioDetails>
@@ -59,9 +61,7 @@ export const Radio = () => {
           </MarqueeContainer>
         </AdminDetails>
       </DjRadioDetails>
-      <audio ref={audioRef}>
-        <source onEnded={handleEnded} src="https://stream.zeno.fm/ezj7hvwkfk2tv" type="audio/mpeg" />
-      </audio>
+      <audio onEnded={handlePlay} ref={audioRef} src={urlStream} />
       <ContainerPlayVolume className='box'>
         <PlayPause aria-label='PlayPause' type='button' onClick={() => toggleAudio()}>
             <span className={play ? "play active" : "play"}></span>

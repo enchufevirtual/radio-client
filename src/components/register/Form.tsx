@@ -11,20 +11,20 @@ import { AlertMessage } from "../alert";
 
 export const Form = (): JSX.Element => {
 
-  const { check, name, success, email, password, repeatPassword } = useGlobal();
+  const { check, username, success, email, password, repeatPassword } = useGlobal();
   const { onSubmit, onChange, handleFile } = check;
 
   return (
     <FormStyles onSubmit={e => onSubmit(e)} autoComplete="off" encType='multipart/form-data'>
       <AlertMessage data={{id: 'send', success: success}} />
       <GroupInput>
-        <Label htmlFor="name">Nombre</Label>
-        <Input type="text" id='name' name='name' value={name} onChange={e => onChange(e)} />
-        <AlertMessage data={{id: 'name'}} />
+        <Label htmlFor="username">Username</Label>
+        <Input type="text" id='username' name='username' value={username} onChange={onChange} />
+        <AlertMessage data={{id: 'username'}} />
       </GroupInput>
       <GroupInput >
         <Label htmlFor="email">Email</Label>
-        <Input type="email" id='email' name='email' value={email} onChange={e => onChange(e)} />
+        <Input type="email" id='email' name='email' value={email} onChange={onChange} />
         <AlertMessage data={{id: 'email'}} />
       </GroupInput>
       <GroupInput>
@@ -34,7 +34,7 @@ export const Form = (): JSX.Element => {
           id='password'
           name='password'
           value={password}
-          onChange={e => onChange(e)}
+          onChange={onChange}
         />
         <AlertMessage data={{id: 'password'}} />
       </GroupInput>
@@ -45,7 +45,7 @@ export const Form = (): JSX.Element => {
           id='repeatPassword'
           name='repeatPassword'
           value={repeatPassword}
-          onChange={e => onChange(e)}
+          onChange={onChange}
         />
         <AlertMessage data={{id: 'repeatPassword'}} />
       </GroupInput>
@@ -56,7 +56,7 @@ export const Form = (): JSX.Element => {
           id='image'
           name='image'
           accept="image/png, image/gif, image/jpeg, image/jpg"
-          onChange={e => handleFile(e)}
+          onChange={handleFile}
         />
         <AlertMessage data={{id: 'image'}} />
       </GroupInput>

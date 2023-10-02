@@ -71,8 +71,12 @@ export const ImageClose = styled.img`
   top: 0;
   right: 0;
   padding: 8px;
+  margin: 6px;
   width: 28px;
   height: 28px;
+  background: rgba(83, 83, 95, 0.38);
+  border-radius: 50%;
+  cursor: pointer;
 
   &:hover {
     background-color: rgba(255, 255, 255, .1);

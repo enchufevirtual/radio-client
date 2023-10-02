@@ -1,4 +1,5 @@
 import styled, { keyframes } from "styled-components";
+import { DEFAULT_BG_AUDIO } from "../../../src/styles/constants";
 
 export const Radio = styled.div`
   display: grid;
@@ -6,7 +7,8 @@ export const Radio = styled.div`
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: rgba(33, 38, 45, .97);
+  background-color: ${DEFAULT_BG_AUDIO};
+  box-shadow: 1px 1px 50px rgba(0, 0, 0, .3);
   padding: 1rem;
   border-radius: 6px;
   width: 450px;

@@ -4,6 +4,7 @@ import { GlobalStyle } from '../styles/GlobalStyle';
 import { GlobalProvider } from '../context/GlobalProvider';
 import { AuthProvider } from '../context/AuthProvider';
 import { SocketProvider } from '../context/SocketProvider';
+import { PostProvider } from '../context/PostProvider';
 import { AuthLayout } from '../layout/AuthLayout';
 import { UserLayout } from '../layout/UserLayout';
 
@@ -29,6 +30,7 @@ const App = (): JSX.Element => {
       <GlobalProvider>
         <AuthProvider>
           <SocketProvider>
+            <PostProvider>
             <Routes>
               <Route element={<AuthLayout />}>
                 {routes.map(({ component: Component, url }) => (
@@ -59,6 +61,7 @@ const App = (): JSX.Element => {
               </Route>
               <Route path='*' element={<NotFound />} />
             </Routes>
+            </PostProvider>
           </SocketProvider>
         </AuthProvider>
       </GlobalProvider>

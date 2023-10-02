@@ -3,9 +3,12 @@ import { Link } from 'react-router-dom';
 import { NavStyle } from '../styles';
 import { MenuProfileProps } from 'types/types';
 import { useAuth } from '../../../hooks/useAuth';
+import { useGlobal } from '../../../../src/hooks/useGlobal';
+import { MENU_NAV } from '../../../../src/context/constants';
 
-export const MenuProfile = ({setMenu, imgRef}: MenuProfileProps): JSX.Element => {
+export const MenuProfile = ({imgRef}: MenuProfileProps): JSX.Element => {
 
+  const { dispatch } = useGlobal();
   const { logOut, auth } = useAuth();
   const menuRef = useRef(null);
 
@@ -17,7 +20,7 @@ export const MenuProfile = ({setMenu, imgRef}: MenuProfileProps): JSX.Element =>
         imgRef.current &&
         !imgRef.current.contains(event.target as Element)
       ) {
-        setMenu(false);
+        dispatch({type: MENU_NAV, payload: false})
       }
     }
     document.addEventListener('mousedown', menuOutside);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ContainerInputs,
   SettingsInput,
@@ -14,21 +14,26 @@ import {
 } from './styles';
 import { GroupInput, Label } from '../../styles/Form/styles';
 import { useSettingsProfile } from '../../hooks/useSettingsProfile';
+import { useGlobal } from '../../../src/hooks/useGlobal';
 import { useAuth } from '../../hooks/useAuth';
 import { AlertMessage } from '../alert';
+import { Auth, MyPostTypes, StateUpdater } from '../../../src/context/types';
+import { PreviousImage } from '../posts/styles';
 
 export const SettingsProfile = (): JSX.Element => {
 
-  const { profile, onChange, onChangeSocial, handleFile, handleSubmit, previewImage } = useSettingsProfile();
+  const { profile, onChange, onChangeSocial, handleSubmit, setProfile } = useSettingsProfile();
+
   const { success } = useAuth();
+  const { handleFile, previewImage } = useGlobal();
   const { name, username, description, email, social, image } = profile;
 
   const api = process.env.API_AVATAR;
   const key = process.env.API_KEY;
 
-  const imageProfile = `${image
-    ? `${process.env.BACKEND_URL}/${image}`
-    : `${api}/${name}.png?apikey=${key}`}`
+  const newImage = `${previewImage == null && !image
+    ? `${api}/${name}.png?apikey=${key}`
+    : `${process.env.BACKEND_URL}/${image}`}`
 
   if (!profile.id) return null;
 
@@ -128,10 +133,10 @@ export const SettingsProfile = (): JSX.Element => {
           </div>
           <ContainerImage className="editImage">
             <Label htmlFor="image">Imagen de Perfil</Label>
-            {previewImage ? (
+            {previewImage !== null ? (
               <img src={`${previewImage}`} alt="Imagen Previa del Perfil" />
             ) : (
-              <img src={`${imageProfile}`} alt="Imagen de Perfil" />
+              <img src={`${newImage}`} alt="Imagen de Perfil" />
             )}
             <label htmlFor="image" className="custom-upload-button">
               {previewImage ? "Cambiar Imagen" : "Subir Imagen"}
@@ -141,7 +146,12 @@ export const SettingsProfile = (): JSX.Element => {
               name="image"
               id="image"
               accept="image/png, image/gif, image/jpeg, image/jpg"
-              onChange={handleFile}
+              onChange={ (event) =>
+                handleFile(
+                  event,
+                  setProfile as StateUpdater<Auth | MyPostTypes>,
+                  )
+                }
             />
             <AlertMessage data={{id: 'image-alert'}} />
             <p>El formato debe ser JPEG, PNG o GIF y no puede superar los 10 MB.</p>

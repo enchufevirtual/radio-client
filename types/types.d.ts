@@ -16,6 +16,15 @@ export interface Data {
 }
 
 export interface MenuProfileProps {
-  setMenu: React.Dispatch<React.SetStateAction<boolean>>;
   imgRef: React.RefObject<HTMLImageElement>;
+}
+
+export interface CardTypes {
+  title: string,
+  createAt: string,
+  postContent: string,
+  user: {
+    name: string,
+    image: string
+  }
 }
