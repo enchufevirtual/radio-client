@@ -8,10 +8,11 @@ export const ContainerProfile = styled.div`
   grid-template-columns: 1fr 1fr;
   margin-top: 70px;
   width: 900px;
-  max-width: 95%;
+  max-width: 100%;
+  gap: 14px;
 
   @media (max-width: 991px) {
-    grid-template-columns: 90%;
+    grid-template-columns: 100%;
     place-items: center;
     place-content: center;
     gap: 2rem
@@ -20,7 +21,7 @@ export const ContainerProfile = styled.div`
 export const ContainerInfoProfile= styled.div`
   display: flex;
   flex-direction: column;
-  max-width: 95%;
+  max-width: 100%;
   gap: 1rem;
   @media (max-width: 991px) {
     width: 500px;
@@ -31,7 +32,7 @@ export const ContainerPostProfile= styled.div`
   margin-top: -70px;
   align-self: flex-start;
   @media (max-width: 991px) {
-    max-width: 95%;
+    max-width: 100%;
   }
 `;
 

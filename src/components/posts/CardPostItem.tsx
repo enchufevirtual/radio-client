@@ -4,12 +4,14 @@ import { CardPost, PostAuthor, AudioControl, PostContent } from './styles';
 import { formatDateTime } from '../../../src/helpers/formatDateTime';
 import { CardPostItemTypes } from '../../../src/context/types';
 import { useGlobal } from '../../../src/hooks/useGlobal';
+import { useAuth } from '../../../src/hooks/useAuth';
 import { Comments } from '../comments';
 
 export const CardPostItem = ({ user, audio, nameAudio, id, image, content, createAt }: CardPostItemTypes): JSX.Element => {
 
   const [timeAgo, setTimeAgo] = useState("");
   const { toggleAudio } = useGlobal();
+  const { auth } = useAuth();
 
   let newNameAudio = ""
   newNameAudio = nameAudio.split('.').slice(0, -1).join('.')
@@ -41,9 +43,9 @@ export const CardPostItem = ({ user, audio, nameAudio, id, image, content, creat
   return (
     <CardPost className='ContentPost'>
       <PostAuthor>
-        <Link to={`/${user?.username}`}><img src={url} alt="Author" /></Link>
+        <Link to={`${auth.id}` ? `/${user?.username}` : ""}><img src={url} alt="Author" /></Link>
         <div className='Author'>
-          <Link to={`/${user?.username}`}>{user?.username ?? 'Autor desconocido'}</Link>
+          <Link to={`${auth.id}` ? `/${user?.username}` : ""}>{user?.username ?? 'Autor desconocido'}</Link>
           <p>{timeAgo}</p>
         </div>
       </PostAuthor>

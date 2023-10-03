@@ -264,8 +264,6 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   // Chat
   const handleChat = () => {
     dispatch({type: OPEN_CHAT});
-    const zIndex = state.openChat && 7;
-    dispatch({type: ZINDEX_LOADING, payload: zIndex})
     dispatch({type: CLOSE_LOGIN_CHAT});
   }
 

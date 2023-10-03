@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { usePost } from '../../../src/hooks/usePost';
 import { CardPostItem } from './CardPostItem';
 import { useAuth } from '../../../src/hooks/useAuth';
+import { NoContent } from './styles';
 
 type AllAllowedPost = { allAllowedPost: boolean}
 
@@ -9,12 +10,13 @@ export const CardContainerPost = ({allAllowedPost}: AllAllowedPost): JSX.Element
 
   const { posts } = usePost();
   const { profile } = useAuth();
+  let dataCard
 
   const filterPost = !allAllowedPost
-    ? posts.filter(post => post.userId == profile.id)
-    : posts;
+  ? posts.filter(post => post.userId == profile.id)
+  : posts;
 
-  const dataCard = filterPost.map((post, index) => (
+  dataCard = filterPost.map((post, index) => (
     <CardPostItem
       key={index}
       id={post.id}
@@ -29,7 +31,10 @@ export const CardContainerPost = ({allAllowedPost}: AllAllowedPost): JSX.Element
 
   return (
     <>
-       {dataCard}
+       { dataCard.length
+        ? dataCard
+        : <NoContent>Aún no hay publicaciones</NoContent>
+       }
     </>
   )
 }

@@ -1,5 +1,4 @@
 import {
-  DEFAULT_NAV_COLOR,
   OPACITY,
   DEFAULT_BG_COLOR,
   DEFAULT_COLOR,
@@ -374,4 +373,13 @@ export const AudioControl = styled.div`
     justify-content: center;
     align-items: center;
   }
+`;
+export const NoContent = styled.div`
+  background-color: ${DEFAULT_BG_AUDIO};
+  width: 100%;
+  height: 200px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
