@@ -12,7 +12,6 @@ import { useUser } from '../../hooks/useUser';
 export const Chat = () => {
 
   const { closeLoginChat, menuNav, inputRef } = useGlobal();
-  const { handleUser } = useUser();
   const [openEmoji, setOpenEmoji] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
 
@@ -91,9 +90,9 @@ export const Chat = () => {
         }
         return (
           <ContainerUserChat key={index} ref={index === messages.length - 1 ? lastMessageRef : null}>
-            <img onClick={() => handleUser(`${message.userId}`)} src={imageUser} alt="User Image" />
+            <img src={imageUser} alt="User Image" />
             <BodyMessage>
-              <h4 onClick={() => handleUser(`${message.userId}`)} style={{ color }}>{message.from ?? message.name}<small>:</small></h4>{message.body}
+              <h4 style={{ color }}>{message.from ?? message.name}<small>:</small></h4>{message.body}
             </BodyMessage>
           </ContainerUserChat>
         );

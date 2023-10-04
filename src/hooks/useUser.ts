@@ -56,7 +56,7 @@ export function useUser() {
       setUserExists(false);
     } finally {
       setLoadingPage(false);
-      if (!match)  dispatch({type: OPEN_CHAT, payload: false})
+      // if (!match)  dispatch({type: OPEN_CHAT, payload: false})
     }
   }
   return {

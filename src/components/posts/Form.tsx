@@ -1,4 +1,4 @@
-import React, {useState, Dispatch} from 'react';
+import React from 'react';
 import {
   Form as FormStyles,
   PostUser,
@@ -18,11 +18,12 @@ import Close from '../../public/assets/close.svg';
 import { ImageSvg } from './ImageSvg';
 import { AudioSvg } from './AudioSvg';
 import { AlertMessage } from '../alert';
+import { PREVIEW_IMAGE } from '../../../src/context/constants';
 
 export const Form = (): JSX.Element => {
 
   const { auth } = useAuth();
-  const { previewImage, handleFile, previewAudio } = useGlobal();
+  const { previewImage, handleFile, previewAudio, dispatch } = useGlobal();
 
   const {
     handlePost,
@@ -36,6 +37,13 @@ export const Form = (): JSX.Element => {
     setCloseAudio,
   } = usePost();
 
+  const CloseForm = () => {
+    dispatch({type: PREVIEW_IMAGE, payload: false});
+    setTimeout(() => {
+      setShowForm(false);
+    }, 10);
+  }
+
 
   let sizePreviewAudio = "";
   sizePreviewAudio = String(Math.round(previewAudio?.size / 1048576));
@@ -48,7 +56,7 @@ export const Form = (): JSX.Element => {
     <BackFormOpacity>
       <ContainerForm>
         <FormStyles ref={formRef} onSubmit={handlePost} encType='multipart/form-data'>
-          <img onClick={() => setShowForm(false)} className='CloseForm' src={Close} alt="Close Form" />
+          <img onClick={CloseForm} className='CloseForm' src={Close} alt="Close Form" />
           <PostUser className='PostUser'>
             <img src={url} alt="User Auth" />
             <p>{auth?.name}</p>

@@ -140,7 +140,11 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
         formRef.current &&
         !formRef.current.contains(event.target as Element)
       ) {
-        setShowForm(false);
+        dispatch({type: PREVIEW_IMAGE, payload: false});
+
+        setTimeout(() => {
+          setShowForm(false);
+        }, 10);
       }
     }
     document.addEventListener('mousedown', formOutside);

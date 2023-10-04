@@ -43,9 +43,11 @@ export const CardPostItem = ({ user, audio, nameAudio, id, image, content, creat
   return (
     <CardPost className='ContentPost'>
       <PostAuthor>
-        <Link to={`${auth.id}` ? `/${user?.username}` : ""}><img src={url} alt="Author" /></Link>
+        <Link to={`${auth?.id}` ? `/${user?.username}` : ""}><img src={url} alt="Author" /></Link>
         <div className='Author'>
-          <Link to={`${auth.id}` ? `/${user?.username}` : ""}>{user?.username ?? 'Autor desconocido'}</Link>
+          <Link to={`${auth?.id}` ? `/${user?.username}` : ""}>
+            {user?.username ?? 'Autor desconocido'}
+          </Link>
           <p>{timeAgo}</p>
         </div>
       </PostAuthor>

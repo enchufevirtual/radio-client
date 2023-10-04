@@ -44,18 +44,12 @@ export const GlobalStyle = createGlobalStyle`
     z-index: 10;
     background-color: transparent;
   }
-  *::-webkit-scrollbar-button:vertical:increment {
-    background-color: ${SCROLL_BG};
-  }
-  *::-webkit-scrollbar-button:vertical:decrement {
-    background-color: ${SCROLL_BG};
-  }
   *::-webkit-scrollbar-track {
-    background: #000;
+    background: transparent;
   }
   *::-webkit-scrollbar-thumb {
     background-color: ${SCROLL_BG};
-    border-radius: 7px;
+    border-radius: 4px;
   }
   @media (max-width: 768px) {
     ::-webkit-scrollbar {display: none;}

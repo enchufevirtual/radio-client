@@ -18,5 +18,5 @@ export const LINK: string = '#2f81f7';
 export const WARNINGS: string = '#FF8C00';
 
 // Scroll
-export const SCROLL_BG: string = '#777';
+export const SCROLL_BG: string = '#999';
 
