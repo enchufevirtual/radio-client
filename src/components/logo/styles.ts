@@ -17,4 +17,5 @@ export const LogoContainer = styled(Link)`
 export const SvgStyle = styled.svg`
   width: 50px;
   height: 50px;
+  border-radius: 6px;
 `;

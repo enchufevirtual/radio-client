@@ -19,6 +19,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { AlertMessage } from '../alert';
 import { Auth, MyPostTypes, StateUpdater } from '../../../src/context/types';
 import { PreviousImage } from '../posts/styles';
+import { getAvatarUrl } from '../../helpers/getAvatarUrl';
 
 export const SettingsProfile = (): JSX.Element => {
 
@@ -28,12 +29,7 @@ export const SettingsProfile = (): JSX.Element => {
   const { handleFile, previewImage } = useGlobal();
   const { name, username, description, email, social, image } = profile;
 
-  const api = process.env.API_AVATAR;
-  const key = process.env.API_KEY;
-
-  const newImage = `${previewImage == null && !image
-    ? `${api}/${name}.png?apikey=${key}`
-    : `${process.env.BACKEND_URL}/${image}`}`
+  const newImage = previewImage ? String(previewImage) : getAvatarUrl(image, name);
 
   if (!profile.id) return null;
 
@@ -133,10 +129,10 @@ export const SettingsProfile = (): JSX.Element => {
           </div>
           <ContainerImage className="editImage">
             <Label htmlFor="image">Imagen de Perfil</Label>
-            {previewImage !== null ? (
-              <img src={`${previewImage}`} alt="Imagen Previa del Perfil" />
+            {previewImage ? (
+              <img src={String(previewImage)} alt="Imagen Previa del Perfil" />
             ) : (
-              <img src={`${newImage}`} alt="Imagen de Perfil" />
+              <img src={newImage} alt="Imagen de Perfil" />
             )}
             <label htmlFor="image" className="custom-upload-button">
               {previewImage ? "Cambiar Imagen" : "Subir Imagen"}

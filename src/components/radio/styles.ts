@@ -73,7 +73,6 @@ export const DjRadioDetails = styled.div`
 
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
 
   svg {
     width: 40px;
@@ -210,9 +209,43 @@ export const PlayPause = styled.button`
   }
 `;
 
-export const SvgStyle = styled.svg`
+export const LogoWrapper = styled.div<{ active: boolean }>`
   width: 50px;
   height: 50px;
+  position: relative;
+  display: inline-flex;
+  justify-content: start;
+  cursor: pointer;
+  border-radius: 16px;
+  box-sizing: border-box;
+`;
+
+export const BackgroundLayer = styled.span<{ active: boolean }>`
+  position: absolute;
+  inset: 1px;
+  background: ${({ active }) => active ? '#3b82f6' : 'transparent'};
+  transition: background 300ms ease;
+  border-radius: 12px;
+  width: 38px;
+  height: 38px;
+  z-index: 0;
+`;
+
+export const SvgStyle = styled.svg`
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: relative;
+  z-index: 1;
+  transition: transform 180ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
 `;
 
 export const ChatLogoStyle = styled.div`

@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect, useReducer } from "react";
 import type {  FormEventHandler, ChangeEventHandler } from 'react';
 import { GlobalProviderTypes, Auth, HandleFileCallback, MyPostTypes, GLOBAL_STATE } from "./types";
 import { GlobalContext } from "./GlobalContext";
-import { ErrorResponse, ErrorRequest } from "types/types";
+import { getErrorMessage } from "../helpers/getErrorMessage";
+import { ErrorRequest } from "types/types";
 import { clientAxios } from "../config/axios";
 import { globalReducer } from "./globalReducer";
 import {
@@ -22,7 +23,11 @@ import {
   IS_PLAYING,
   ZENO_API,
   INPUT_PAYLOAD,
-  INPUT_FILES
+  INPUT_FILES,
+  STREAM_URL,
+  PLAYING_FROM,
+  AUDIO_TITLE,
+  SWITCH_TO_RADIO
 } from "./constants";
 
 export const GlobalProvider = ({children}: GlobalProviderTypes) => {
@@ -49,6 +54,9 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     play: false,
     isPlaying: false,
     zenoAPI: false,
+    streamUrl: process.env.URL_STREAM || 'https://stream.zeno.fm/hnwgw0jr0gatv',
+    playingFrom: 'radio',
+    audioTitle: 'Tu nueva experiencia musical',
   }
 
   const [state, dispatch] = useReducer(globalReducer, initialState);
@@ -146,7 +154,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         dispatch({type: INPUT})
       } catch (error) {
 
-        const { message } = (error as ErrorResponse).response.data;
+        const message = getErrorMessage(error);
         if (message == `${this.username.toLowerCase()} ya está registrado`) {
           CheckBeforeSend.messageNotification('username', message)
         }
@@ -197,7 +205,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     const getCurrentSong = async () => {
       try {
         const { data } = await clientAxios('/zeno');
-        dispatch({ type: CURRENT_SONG, payload: data.title })
+        dispatch({ type: CURRENT_SONG, payload: data.title });
+        dispatch({ type: STREAM_URL, payload: data.streamUrl });
         dispatch({type: ZENO_API, payload: false});
       } catch (error) {
         const errorMsg = error as ErrorRequest;
@@ -216,40 +225,152 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     return () => clearInterval(interval);
   }, [state.zenoAPI]);
 
-  const onPlay = async () => {
+  const getAudioSource = (src: string): string => {
+    if (!src) return '';
+    const trimmed = src.trim();
+    if (/^https?:\/\//.test(trimmed)) return trimmed;
+    const backend = process.env.BACKEND_URL?.replace(/\/$/, '') || window.location.origin;
+    return `${backend}/${trimmed.replace(/^\//, '')}`;
+  };
+
+  const onPlay = async (): Promise<void> => {
     const audio = audioRef.current;
-    audio?.load();
-    audio?.play();
-    dispatch({type: PLAY, payload: true});
-    dispatch({type: IS_PLAYING, payload: true});
-  }
+    if (!audio) return;
+
+    const playAudio = async () => {
+      await audio.play();
+      dispatch({type: PLAY, payload: true});
+      dispatch({type: IS_PLAYING, payload: true});
+    };
+
+    try {
+      await playAudio();
+    } catch (error) {
+      console.warn('Audio playback prevented or failed, waiting for canplaythrough:', error);
+
+      const audioCanPlay = new Promise<void>((resolve, reject) => {
+        const handleCanPlay = () => {
+          cleanup();
+          resolve();
+        };
+        const handleError = () => {
+          cleanup();
+          reject(new Error('Audio failed to load'));
+        };
+        const cleanup = () => {
+          audio.removeEventListener('canplaythrough', handleCanPlay);
+          audio.removeEventListener('error', handleError);
+        };
+        audio.addEventListener('canplaythrough', handleCanPlay);
+        audio.addEventListener('error', handleError);
+      });
+
+      try {
+        await audioCanPlay;
+        await playAudio();
+      } catch (loadError) {
+        console.warn('Audio could not start after load:', loadError);
+        dispatch({type: PLAY, payload: false});
+        dispatch({type: IS_PLAYING, payload: false});
+      }
+    }
+  };
+
   const onPause = (): void => {
     const audio = audioRef.current;
-    audio?.pause();
+    if (!audio) return;
+
+    audio.pause();
     dispatch({type: PLAY, payload: false});
     dispatch({type: IS_PLAYING, payload: false});
-  }
-  const toggleAudio = async (src: string): Promise<void> => {
-    const audio = audioRef.current;
+  };
 
-    if (!src) {
-      if (audio.paused) {
-        onPlay();
-      } else {
-        onPause()
+  const toggleAudio = async (src?: string, audioTitle?: string): Promise<void> => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const requestedSrc = src?.trim();
+    const requestedAudioSource = requestedSrc ? getAudioSource(requestedSrc) : '';
+    const isSameSource = requestedSrc && state.currentAudio === requestedAudioSource;
+
+    if (requestedSrc) {
+      if (!state.currentAudio || !isSameSource) {
+        const audioSource = requestedAudioSource;
+        if (!audioSource) {
+          console.warn('toggleAudio: missing audio source');
+          return;
+        }
+        if (!audio.paused) {
+          audio.pause();
+        }
+        audio.src = audioSource;
+        audio.load();
+        audio.currentTime = 0;
+        dispatch({type: CURRENT_AUDIO, payload: audioSource});
+        
+        // Si viene audioTitle, es una publicación
+        if (audioTitle) {
+          dispatch({type: PLAYING_FROM, payload: 'post'});
+          dispatch({type: AUDIO_TITLE, payload: audioTitle});
+        }
+        
+        await onPlay();
+        return;
       }
-      return;
     }
-    if (!state.currentAudio || state.currentAudio !== src) {
-      audio.src = `${process.env.BACKEND_URL}/${src}`;
-      dispatch({type: CURRENT_AUDIO, payload: src});
-      onPlay();
+
+    if (audio.paused) {
+      await onPlay();
     } else {
-      if (audio.paused) {
-        onPlay();
-      } else {
-        onPause();
+      onPause();
+    }
+  };
+
+  const playPostAudio = async (src: string, audioTitle: string): Promise<void> => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    try {
+      const audioSource = getAudioSource(src.trim());
+      if (!audioSource) {
+        console.warn('playPostAudio: missing audio source');
+        return;
       }
+
+      if (!audio.paused) {
+        audio.pause();
+      }
+
+      audio.src = audioSource;
+      audio.load();
+      audio.currentTime = 0;
+      dispatch({type: CURRENT_AUDIO, payload: audioSource});
+      dispatch({type: PLAYING_FROM, payload: 'post'});
+      dispatch({type: AUDIO_TITLE, payload: audioTitle});
+      await onPlay();
+    } catch (error) {
+      console.error('Error playing post audio:', error);
+    }
+  };
+
+  const switchToRadio = async (): Promise<void> => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    try {
+      if (!audio.paused) {
+        audio.pause();
+      }
+
+      audio.src = state.streamUrl;
+      audio.load();
+      audio.currentTime = 0;
+      dispatch({type: CURRENT_AUDIO, payload: state.streamUrl});
+      dispatch({type: PLAYING_FROM, payload: 'radio'});
+      dispatch({type: AUDIO_TITLE, payload: state.currentSong});
+      await onPlay();
+    } catch (error) {
+      console.error('Error switching to radio:', error);
     }
   };
 
@@ -258,8 +379,34 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   }
   useEffect(() => {
     const audio = audioRef.current;
-    audio ? audio.volume = state.volumeValue / 100 : null;
-  }, [state.volumeValue, audioRef]);
+    if (!audio) return;
+
+    const handlePlayEvent = () => {
+      dispatch({type: PLAY, payload: true});
+      dispatch({type: IS_PLAYING, payload: true});
+    };
+    const handlePauseEvent = () => {
+      dispatch({type: PLAY, payload: false});
+      dispatch({type: IS_PLAYING, payload: false});
+    };
+    const handleErrorEvent = () => {
+      dispatch({type: PLAY, payload: false});
+      dispatch({type: IS_PLAYING, payload: false});
+    };
+
+    audio.volume = state.volumeValue / 100;
+    audio.addEventListener('play', handlePlayEvent);
+    audio.addEventListener('pause', handlePauseEvent);
+    audio.addEventListener('ended', handlePauseEvent);
+    audio.addEventListener('error', handleErrorEvent);
+
+    return () => {
+      audio.removeEventListener('play', handlePlayEvent);
+      audio.removeEventListener('pause', handlePauseEvent);
+      audio.removeEventListener('ended', handlePauseEvent);
+      audio.removeEventListener('error', handleErrorEvent);
+    };
+  }, [state.volumeValue]);
 
   // Chat
   const handleChat = () => {
@@ -272,39 +419,44 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     event,
     cb,
   ) => {
-    const { name, files } = event.target;
-    // Reset the value of the file input element
+    const target = event.target as HTMLInputElement;
+    const { name, files } = target;
 
-    if (files && files[0]) {
-      const reader = new FileReader();
-      // Read audio and image files
-      reader.onload = ( { target } ) => {
-        if (files[0].type.startsWith('image/')) {
-          dispatch({type: PREVIEW_IMAGE, payload: target.result});
-        } else if (files[0].type.startsWith('audio/')) {
-          dispatch({
-            type: PREVIEW_AUDIO,
-            payload: {
-              name: files[0].name,
-              size: files[0].size
-            }
-          });
-        }
-      };
-      // We reset the value of the event when it finishes reading and the data is sent
-      reader.onloadend = () => event.target.value = '';
-      // Read the contents of the specified Blob or File
-      reader.readAsDataURL(files[0]);
+    if (!files || !files[0]) return;
 
-      cb((prev) => ({
-        ...prev,
-        [name]: files![0]
-      }));
-    }
+    const file = files[0];
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const result = reader.result;
+      if (file.type.startsWith('image/')) {
+        dispatch({ type: PREVIEW_IMAGE, payload: result });
+      } else if (file.type.startsWith('audio/')) {
+        dispatch({
+          type: PREVIEW_AUDIO,
+          payload: {
+            name: file.name,
+            size: file.size
+          }
+        });
+      }
+    };
+
+    reader.onloadend = () => {
+      target.value = '';
+    };
+
+    reader.readAsDataURL(file);
+
+    cb((prev) => ({
+      ...prev,
+      [name]: file
+    }));
   };
 
   const radio = {
     audioRef,
+    currentAudio: state.currentAudio,
     volume,
     volumeValue: state.volumeValue,
     onPlay,
@@ -312,7 +464,12 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     isPlaying: state.isPlaying,
     play: state.play,
     toggleAudio,
-    currentSong: state.currentSong
+    playPostAudio,
+    switchToRadio,
+    currentSong: state.currentSong,
+    audioTitle: state.audioTitle,
+    playingFrom: state.playingFrom,
+    streamUrl: state.streamUrl
   }
 
   const register = {

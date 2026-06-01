@@ -3,66 +3,87 @@ import { CssStyleButtons, CssButton } from "../../styles/Form/styles";
 
 export const ContainerLogin = styled.div`
   background-color: rgb(33, 38, 45);
-  outline: rgb(48, 54, 61) solid 1px;
-  box-shadow: 0.08em 0.3em 0.8em 0.13em rgba(0,0,0,.15);
-  border-radius: 6px;
+  outline: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  border-radius: 0.375em;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 300px;
+  width: 210px;
   max-width: 90%;
-  height: 260px;
+  height: 200px;
   inset: 0px;
   margin: 0 auto;
   position: absolute;
-  bottom: 0;
   top: 50%;
   left: 50%;
   overflow: hidden;
   transform: translate(-50%, -50%);
+  padding: 0;
 
   .DraggableLoginChat {
     position: absolute;
     top: 0;
     left: 0;
-    width: 90%;
-    height: 60px;
+    width: 100%;
+    height: 24px;
+    cursor: grab;
   }
   .LoginChat {
-    width: 84%;
+    width: 92%;
+    margin-bottom: 0 !important;
   }
   @media (max-width: 480px) {
-    width: 80%;
-    height: 300px;
+    width: 92%;
+    height: 240px;
   }
   @media (max-width: 310px) {
-    height: 280px;
+    height: 250px;
   }
   #alert {
     position: absolute;
-    top: 48px;
+    top: 1px;
     font-size: 12px;
+    color: #ff8a8a;
+    width: 100%;
+    text-align: center;
 
     @media (max-width: 480px) {
-      top: 62px;
+      top: 58px;
     }
     @media (max-width: 310px) {
-      top: 30px;
+      top: 45px;
     }
   }
   label {
-    margin-bottom: 24px;
+    margin-bottom: 12px;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+    color: #f8f9fb;
 
     @media (max-width: 480px) {
-     font-size: 22px;
+     font-size: 18px;
     }
   }
   input {
     margin-bottom: 10px;
     width: 100%;
+    font-size: 14px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border-radius: 0.375em;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      border-color: rgba(29, 147, 255, 0.75);
+      outline: none;
+    }
+
     @media (max-width: 480px) {
-      height: 42px;
-      font-size: 16px;
+      height: 40px;
+      font-size: 15px;
     }
   }
 `;
@@ -77,6 +98,7 @@ export const ImageClose = styled.img`
   background: rgba(83, 83, 95, 0.38);
   border-radius: 50%;
   cursor: pointer;
+  z-index: 10;
 
   &:hover {
     background-color: rgba(255, 255, 255, .1);
@@ -84,28 +106,36 @@ export const ImageClose = styled.img`
 `;
 export const GroupButtons = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: end;
   align-items: center;
   gap: 10px;
-  margin-top: 14px;
+
   a {
     text-decoration: none;
-    width: fit-content !important;
-    ${css`${CssButton}`}
-    font-size: 84%;
+    font-size: 13px;
+    padding: 5px !important;
+    width: 80px;
+    text-align: center;
+    border-radius: 0.375em;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
 
-    @media (max-width: 310px) {
-      width: 100% !important;
+    &:hover {
+      background: rgba(255,255,255,0.14);
     }
   }
 
   button {
-    ${css`${CssStyleButtons}`}
-    font-size: 84%;
+    width: 40%;
+    height: 100% !important;
+    font-size: 13px;
+    border-radius: 0.375em;
   }
+
   @media (max-width: 310px) {
     flex-direction: column;
 
+    a,
     button {
       width: 100%;
     }

@@ -6,11 +6,11 @@ import { ChatLogo } from './ChatLogo';
 import { VolumeLogo } from './VolumeLogo';
 import { Volume } from './Volume';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { PLAY } from '../../../src/context/constants';
+import { PLAY, IS_PLAYING } from '../../../src/context/constants';
 
 export const Radio = () => {
 
-  const { toggleAudio, play, audioRef, openChat, handleChat, currentSong, dispatch } = useGlobal();
+  const { toggleAudio, play, audioRef, openChat, handleChat, currentSong, dispatch, streamUrl, currentAudio, audioTitle, playingFrom, switchToRadio } = useGlobal();
 
   const [openVolume, setOpenVolume] = useState(false);
   const [mouseOver, setMouseOver] = useState(false);
@@ -19,19 +19,26 @@ export const Radio = () => {
   const containerVolumeRef = useRef(null);
 
   const match = useMediaQuery('(min-width: 991px)');
-  const urlStream = process.env.URL_STREAM;
 
   useEffect(() => {
     textRef.current.style.animationPlayState = 'running';
   }, []);
 
   const handlePlay = () => {
-    dispatch({type: PLAY, payload: false})
+    dispatch({type: PLAY, payload: false});
+    dispatch({type: IS_PLAYING, payload: false});
+  }
+
+  const displayTitle = playingFrom === 'radio' ? currentSong : audioTitle;
+
+  const handleLogoClick = () => {
+    switchToRadio();
   }
 
   const handleOpenVolume = () => {
     setOpenVolume(!openVolume);
   }
+
   const handleClickOutsideVolume = (event: MouseEvent) => {
     if (volumeLogoRef.current &&
       !volumeLogoRef.current.contains(event.target as Node) &&
@@ -50,18 +57,27 @@ export const Radio = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (!currentAudio && streamUrl) {
+      audio.src = streamUrl;
+    }
+  }, [streamUrl, currentAudio]);
+
   return (
     <RadioStyle className="Radio">
       <DjRadioDetails>
-        <RadioLogo />
+        <RadioLogo onClick={handleLogoClick} />
         <AdminDetails>
           <h2>Radio Ev</h2>
           <MarqueeContainer>
-            <MarqueeText ref={textRef}>{currentSong}</MarqueeText>
+            <MarqueeText ref={textRef}>{displayTitle}</MarqueeText>
           </MarqueeContainer>
         </AdminDetails>
       </DjRadioDetails>
-      <audio onEnded={handlePlay} ref={audioRef} src={urlStream} />
+      <audio onEnded={handlePlay} ref={audioRef} />
       <ContainerPlayVolume className='box'>
         <PlayPause aria-label='PlayPause' type='button' onClick={() => toggleAudio()}>
             <span className={play ? "play active" : "play"}></span>

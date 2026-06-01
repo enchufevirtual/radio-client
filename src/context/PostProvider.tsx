@@ -6,7 +6,7 @@ import { GlobalProviderTypes } from "./types";
 import { useAuth } from "../../src/hooks/useAuth";
 import { useGlobal } from "../../src/hooks/useGlobal";
 import { clientAxios } from "../config/axios";
-import { ErrorResponse } from "types/types";
+import { getErrorMessage } from "../helpers/getErrorMessage";
 import { PREVIEW_AUDIO, PREVIEW_IMAGE } from "./constants";
 
 export const PostProvider = ({children}: GlobalProviderTypes) => {
@@ -52,8 +52,8 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
       setSendPost(true);
       setMyPost({content: "", image: "", audio: ""});
     } catch (error) {
-      const { message } = (error as ErrorResponse).response.data;
-      if (message == 'El archivo excede el límite - (MAX 10MB)') {
+      const message = getErrorMessage(error);
+      if (message === 'El archivo excede el límite - (MAX 10MB)') {
         messageNotification("fileError", "Imagen/Audio - MAX 10MB");
       }
     }

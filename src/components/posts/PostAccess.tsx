@@ -6,6 +6,7 @@ import { useGlobal } from '../../../src/hooks/useGlobal';
 import { Auth, MyPostTypes, StateUpdater } from '../../../src/context/types';
 import { ImageSvg } from './ImageSvg';
 import { AudioSvg } from './AudioSvg';
+import { getAvatarUrl } from '../../helpers/getAvatarUrl';
 
 export const PostAccess = (): JSX.Element => {
 
@@ -22,10 +23,7 @@ export const PostAccess = (): JSX.Element => {
     handleShowForm()
   }, [previewImage, previewAudio])
 
-  const url = `${auth?.image
-    ? `${process.env.BACKEND_URL}/${auth?.image}`
-    : `https://api.multiavatar.com/${auth?.name ? auth?.name.trim() : "radio-ev"}.svg`}`
-
+  const url = getAvatarUrl(auth?.image, auth?.name);
 
   return (
     <PostAccessStyles>

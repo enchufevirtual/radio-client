@@ -19,6 +19,7 @@ import { ImageSvg } from './ImageSvg';
 import { AudioSvg } from './AudioSvg';
 import { AlertMessage } from '../alert';
 import { PREVIEW_IMAGE } from '../../../src/context/constants';
+import { getAvatarUrl } from '../../helpers/getAvatarUrl';
 
 export const Form = (): JSX.Element => {
 
@@ -48,9 +49,7 @@ export const Form = (): JSX.Element => {
   let sizePreviewAudio = "";
   sizePreviewAudio = String(Math.round(previewAudio?.size / 1048576));
 
-  const url = `${auth?.image
-    ? `${process.env.BACKEND_URL}/${auth?.image}`
-    : `https://api.multiavatar.com/${auth?.name.trim()}.svg`}`
+  const url = getAvatarUrl(auth?.image, auth?.name);
 
   return (
     <BackFormOpacity>

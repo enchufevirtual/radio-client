@@ -15,3 +15,7 @@ export const ZINDEX_LOADING = "ZINDEX_LOADING";
 export const CURRENT_SONG = "CURRENT_SONG";
 export const IS_PLAYING = "IS_PLAYING";
 export const ZENO_API = "ZENO_API";
+export const STREAM_URL = "STREAM_URL";
+export const PLAYING_FROM = "PLAYING_FROM";
+export const AUDIO_TITLE = "AUDIO_TITLE";
+export const SWITCH_TO_RADIO = "SWITCH_TO_RADIO";

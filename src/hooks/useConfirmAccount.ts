@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { clientAxios } from "../config/axios";
 import { useGlobal } from "./useGlobal";
-import { ErrorResponse } from "types/types";
+import { getErrorMessage } from "../helpers/getErrorMessage";
 
 export function useConfirmAccount() {
 
@@ -17,7 +17,7 @@ export function useConfirmAccount() {
       messageNotification('send', data.message);
       setSuccess(true);
     } catch (error) {
-      const { message } = (error as ErrorResponse).response.data;
+      const message = getErrorMessage(error);
       console.clear();
       messageNotification('send', message);
       setSuccess(false);

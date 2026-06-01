@@ -5,12 +5,13 @@ import { formatDateTime } from '../../../src/helpers/formatDateTime';
 import { CardPostItemTypes } from '../../../src/context/types';
 import { useGlobal } from '../../../src/hooks/useGlobal';
 import { useAuth } from '../../../src/hooks/useAuth';
+import { getAvatarUrl } from '../../helpers/getAvatarUrl';
 import { Comments } from '../comments';
 
 export const CardPostItem = ({ user, audio, nameAudio, id, image, content, createAt }: CardPostItemTypes): JSX.Element => {
 
   const [timeAgo, setTimeAgo] = useState("");
-  const { toggleAudio } = useGlobal();
+  const { playPostAudio } = useGlobal();
   const { auth } = useAuth();
 
   let newNameAudio = ""
@@ -19,13 +20,8 @@ export const CardPostItem = ({ user, audio, nameAudio, id, image, content, creat
     newNameAudio = nameAudio
   }
 
-  const url = `${user?.image
-    ? `${process.env.BACKEND_URL}/${user?.image}`
-    : `https://api.multiavatar.com/${user?.name.trim()}.svg`}`;
-
-  const postImage = `${image
-    ? `${process.env.BACKEND_URL}/${image}`
-    : null }`;
+  const url = getAvatarUrl(user?.image, user?.name);
+  const postImage = image ? getAvatarUrl(image) : null;
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -58,7 +54,7 @@ export const CardPostItem = ({ user, audio, nameAudio, id, image, content, creat
       { audio && (
         <AudioControl key={audio}>
           <p>{newNameAudio}</p>
-          <button data-id={id} onClick={() => toggleAudio(audio)}>Play</button>
+          <button data-id={id} onClick={() => playPostAudio(audio, newNameAudio)}>Play</button>
         </AudioControl>
       )}
       <Comments />

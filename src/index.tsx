@@ -2,10 +2,10 @@
 
     Name: Radio Ev
     Description: Radio Enchufe Virtual
-    Author: @chendodev - chendo | developer && web designer
-    Author URI: https://facebook.com/chendodev
-    Github: https://github.com/chendodev
-    Youtube: https://youtube.com/@chendodev
+    Author: @soychendo - chendo | developer && web designer
+    Author URI: https://facebook.com/soychendo
+    Github: https://github.com/soychendo
+    Youtube: https://youtube.com/@soychendoo
 
 -----------------------------------------------------------------------------------*/
 import React from 'react'

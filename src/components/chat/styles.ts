@@ -48,12 +48,42 @@ export const ContainerMessages = styled.div`
   background-color: rgb(33, 38, 45);
   overflow-y: auto;
   width: auto;
-  height: 95%;
+  height: 84%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 0.75rem 0 0.75rem;
+`;
+
+export const EmptyChat = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  line-height: 1.5;
+  width: 100%;
+  min-height: 100%;
+  padding: 1rem;
+`;
+
+export const GuestNotice = styled.div`
+  padding: 0.55rem 0.75rem;
+  margin: 0.5rem 0 0.2rem;
+  border-radius: 999px;
+  color: #f5f5f5;
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.4;
+  width: calc(100% - 2rem);
 `;
 export const ContainerUserChat = styled.div`
   display: flex;
+  align-items: flex-start;
   position: relative;
-  gap: .5rem;
+  gap: .75rem;
   padding: 10px 8px 10px 0px;
   width: 100%;
 
@@ -66,22 +96,30 @@ export const ContainerUserChat = styled.div`
   }
 
   img {
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
+    flex-shrink: 0;
   }
 
 `;
 
 export const BodyMessage = styled.div`
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   font-size: 14px;
-  gap: 10px;
+  word-break: break-word;
 
   h4 {
-    display: inline-block;
-    margin-right: 6px;
+    margin: 0;
     font-size: 14px;
+    line-height: 1.2;
+  }
+
+  small {
+    margin-left: 4px;
+    opacity: 0.8;
   }
 `;
 
@@ -117,7 +155,7 @@ export const Form = styled.form`
     ${css`${CssInput}`}
     width: 100%;
     max-height: 100px !important;
-    padding: 0.6rem 10px 4px 34px;
+    padding: 0.2em 10px 4px 34px;
     resize: none;
     font-size: 14px;
     ::-webkit-scrollbar {
@@ -137,7 +175,6 @@ export const Form = styled.form`
     @media (max-width: 370px) {
       width: 100%;
     }
-    align-self: flex-end;
   }
 `;
 // Picker Emojis

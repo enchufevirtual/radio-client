@@ -4,8 +4,7 @@ import { ContainerStyle } from './styles';
 import { useAuth } from '../../hooks/useAuth';
 import { useGlobal } from '../../hooks/useGlobal';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { MENU_NAV } from '../../../src/context/constants';
-
+import { MENU_NAV } from '../../../src/context/constants';import { getAvatarUrl } from '../../helpers/getAvatarUrl';
 const ContainerNav = (): JSX.Element => {
 
   const matches = useMediaQuery("(max-width: 350px)");
@@ -14,14 +13,12 @@ const ContainerNav = (): JSX.Element => {
   const { image, name } = auth;
   const { dispatch, menuNav } = useGlobal();
   const imgRef = useRef(null);
-  const truncatedName = name.length > 10 ? name.slice(0, 10) + '...' : name;
+  const truncatedName = name.length > 30 ? name.slice(0, 30) + '...' : name;
 
   const api = process.env.API_AVATAR;
   const key = process.env.API_KEY;
 
-  const url = `${image
-    ? `${process.env.BACKEND_URL}/${image}`
-    : `${api}/${name}.png?apikey=${key}`}`
+  const url = getAvatarUrl(image, name);
 
   const handleMenu = () => {
     dispatch({type: MENU_NAV, payload: !menuNav});
@@ -29,7 +26,7 @@ const ContainerNav = (): JSX.Element => {
 
   return (
     <ContainerStyle>
-      { !matches ? <p>Bienvenid@, {truncatedName}</p> : null }
+      { !matches ? <p>{truncatedName}</p> : null }
       <img ref={imgRef} onClick={handleMenu} src={url} alt="user" />
       { menuNav && <MenuProfile imgRef={imgRef} /> }
     </ContainerStyle>

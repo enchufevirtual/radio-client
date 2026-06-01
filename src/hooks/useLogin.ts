@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { FormEvent } from 'react'
 import { useGlobal } from "./useGlobal";
 import { clientAxios } from "../config/axios";
-import { ErrorResponse } from "types/types";
+import { getErrorMessage } from "../helpers/getErrorMessage";
 import { useAuth } from "./useAuth";
 
 export function useLogin() {
@@ -35,15 +35,15 @@ export function useLogin() {
       authUser();
       navigate('/');
     } catch (error) {
-      const { message } = (error as ErrorResponse).response.data;
+      const message = getErrorMessage(error);
       console.clear();
-      if (message == 'Esta cuenta no existe') {
+      if (message === 'Esta cuenta no existe') {
         messageNotification('email', message);
       }
-      if (message == 'Tu cuenta no ha sido confirmada') {
+      if (message === 'Tu cuenta no ha sido confirmada') {
         messageNotification('email', message);
       }
-      if (message == 'Lo siento, la contraseña que ha ingresado no es correcta.') {
+      if (message === 'Lo siento, la contraseña que ha ingresado no es correcta.') {
         messageNotification('password', message);
       }
     }

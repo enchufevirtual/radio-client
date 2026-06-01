@@ -18,7 +18,7 @@ export const CardContainerPost = ({allAllowedPost}: AllAllowedPost): JSX.Element
 
   dataCard = filterPost.map((post, index) => (
     <CardPostItem
-      key={index}
+      key={post.id ?? index}
       id={post.id}
       user={post.user}
       image={post.image}

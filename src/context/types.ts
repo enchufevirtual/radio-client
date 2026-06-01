@@ -24,7 +24,11 @@ import {
   ZINDEX_LOADING,
   CURRENT_SONG,
   IS_PLAYING,
-  ZENO_API
+  ZENO_API,
+  STREAM_URL,
+  PLAYING_FROM,
+  AUDIO_TITLE,
+  SWITCH_TO_RADIO
 } from "./constants";
 
 interface InputTypes {
@@ -53,12 +57,16 @@ export interface GLOBAL_ACTION {
     | typeof ZINDEX_LOADING
     | typeof CURRENT_SONG
     | typeof IS_PLAYING
-    | typeof ZENO_API;
+    | typeof ZENO_API
+    | typeof STREAM_URL
+    | typeof PLAYING_FROM
+    | typeof AUDIO_TITLE
+    | typeof SWITCH_TO_RADIO;
   payload?: any; // You can specify the payload type here if needed
 }
 
 export interface GLOBAL_STATE {
-  currentAudio: string,
+  currentAudio: string | null,
   input: InputTypes,
   success: boolean,
   isFooter: boolean,
@@ -73,6 +81,9 @@ export interface GLOBAL_STATE {
   currentSong: string,
   isPlaying: boolean,
   zenoAPI: boolean,
+  streamUrl: string,
+  playingFrom: 'radio' | 'post',
+  audioTitle: string,
 }
 
 export type GlobalProviderTypes = {
@@ -101,7 +112,10 @@ export type ContextProps = {
   password: string,
   repeatPassword: string,
   messageNotification: (fieldName: string, message: string) => void;
-  toggleAudio: (src?: string) => Promise<void>,
+  currentAudio: string,
+  toggleAudio: (src?: string, audioTitle?: string) => Promise<void>,
+  playPostAudio: (src: string, audioTitle: string) => Promise<void>,
+  switchToRadio: () => Promise<void>,
   volume: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPlay: () => Promise<void>;
   onPause: () => void;
@@ -117,6 +131,9 @@ export type ContextProps = {
   inputRef: RefObject<HTMLTextAreaElement>,
   zIndexLoading: number,
   currentSong: string,
+  audioTitle: string,
+  playingFrom: 'radio' | 'post',
+  streamUrl: string,
   handleFile: HandleFileCallback<Auth | MyPostTypes>
   previewImage: string,
   previewAudio: { name: string, size: number }
@@ -164,10 +181,13 @@ export interface AuthContextProps {
 }
 
 export interface Messages {
+  id?: string | number;
   from: string,
   body: string,
-  image: string | Blob,
+  image: string | Blob | null,
   name: string,
+  username?: string,
+  role?: string,
   user?: {
     id: number,
     image: string,
@@ -175,7 +195,7 @@ export interface Messages {
     username: string
   },
   userId?: string | number,
-  createAt: Date,
+  createAt: Date | string,
 }
 
 export interface SocketContextProps {
@@ -188,7 +208,9 @@ export interface SocketContextProps {
   containerRef: RefObject<HTMLDivElement>,
   allowed: boolean,
   setAllowed: React.Dispatch<React.SetStateAction<boolean>>,
-  loadingChat: boolean
+  loadingChat: boolean,
+  connectionStatus: 'connecting' | 'connected' | 'error',
+  usersOnline: number
 }
 
 export type MyPostTypes = {

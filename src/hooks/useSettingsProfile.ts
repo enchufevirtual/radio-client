@@ -81,8 +81,6 @@ export function useSettingsProfile() {
       return;
     }
     updateProfile(profile);
-    if (!isUpdating) return
-    setProfile(auth);
   }
   const regexName = (name: string): boolean => {
     return /^[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s]+$/.test(name);

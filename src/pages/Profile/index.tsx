@@ -19,6 +19,7 @@ import { useUser } from '../../hooks/useUser';
 import { NotFound } from '../NotFound';
 import { IS_FOOTER } from '../../../src/context/constants';
 import { Posts } from '../Posts';
+import { getAvatarUrl } from '../../helpers/getAvatarUrl';
 
 export const Profile = () => {
 
@@ -30,9 +31,7 @@ export const Profile = () => {
 
   const { name, description, createAt, image} = profile;
 
-  const url = `${image
-    ? `${process.env.BACKEND_URL}/${image}`
-    : `https://api.multiavatar.com/${name.trim()}.svg`}`
+  const url = getAvatarUrl(image, name);
 
   const socialmedia = profile.social
   ? Object.entries(profile.social)

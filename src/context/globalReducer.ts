@@ -15,7 +15,11 @@ import {
   ZINDEX_LOADING,
   CURRENT_SONG,
   IS_PLAYING,
-  ZENO_API
+  ZENO_API,
+  STREAM_URL,
+  PLAYING_FROM,
+  AUDIO_TITLE,
+  SWITCH_TO_RADIO
 } from "./constants";
 import { GLOBAL_STATE, GLOBAL_ACTION } from "./types";
 
@@ -125,6 +129,27 @@ export function globalReducer (state: GLOBAL_STATE, action: GLOBAL_ACTION) {
           name: action.payload.name,
           size: action.payload.size,
         }
+      };
+    case STREAM_URL:
+      return {
+        ...state,
+        streamUrl: payload
+      };
+    case PLAYING_FROM:
+      return {
+        ...state,
+        playingFrom: payload
+      };
+    case AUDIO_TITLE:
+      return {
+        ...state,
+        audioTitle: payload
+      };
+    case SWITCH_TO_RADIO:
+      return {
+        ...state,
+        playingFrom: 'radio',
+        audioTitle: 'Tu nueva experiencia musical'
       };
 
     default:

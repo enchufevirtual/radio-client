@@ -8,7 +8,7 @@
     "build": "webpack --mode production",
     "dev": "webpack --mode development"
   },
-  "author": "chendodev",
+  "author": "soychendo",
   "license": "ISC",
   "dependencies": {
     "@emoji-mart/data": "^1.1.2",
@@ -33,6 +33,7 @@
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.21.4",
     "@types/gravatar": "^1.8.3",
+    "@types/node": "^25.9.1",
     "@types/randomcolor": "^0.5.7",
     "@types/react": "^18.0.34",
     "@types/react-dom": "^18.0.11",

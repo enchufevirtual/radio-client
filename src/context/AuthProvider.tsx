@@ -4,7 +4,8 @@ import { clientAxios } from "../config/axios";
 import { GlobalProviderTypes, Auth, StateUpdater } from "./types";
 import { useGlobal } from "../hooks/useGlobal";
 import { useHandleState } from "../../src/hooks/useHandleState";
-import { ErrorResponse, Data, ErrorRequest } from "../../types/types";
+import { getErrorMessage } from "../helpers/getErrorMessage";
+import { Data, ErrorRequest } from "../../types/types";
 
 export const AuthProvider = ({children}: GlobalProviderTypes) => {
 
@@ -37,9 +38,10 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
   const { messageNotification } = useGlobal();
 
   async function authUser() {
-    const token = localStorage.getItem('token_ev')
+    const token = localStorage.getItem('token_ev');
     if (!token) {
       setLoadingPage(false);
+      setLoading(false);
       return;
     };
     const config = {
@@ -53,14 +55,15 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       const { data } = await clientAxios('/users/profile', config);
       setAuth(data);
       setProfile(data);
-      setLoadingPage(false)
     } catch (error) {
       const errorMsg = error as ErrorRequest;
       if (errorMsg.message === "Network Error") {
-        localStorage.removeItem("token_ev");
+        localStorage.removeItem('token_ev');
+        setAuth(null);
+        setProfile(null);
         return;
       }
-      const { message } = (error as ErrorResponse).response.data;
+      const message = getErrorMessage(error);
       if (message === 'Invalid Token') {
         localStorage.removeItem('token_ev');
         location.href = '/'
@@ -70,8 +73,10 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       }
       setAuth(null);
       setProfile(null);
+    } finally {
+      setLoadingPage(false);
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   useEffect(() => {
@@ -93,10 +98,10 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
   const updateProfile = async (updateData: Auth) => {
 
     const { name, username, description, email, social, image, id } = updateData;
-    const descriptionString = description !== null ? description : '';
+    const descriptionString = description !== null && description ? description : '';
     const usernameString = username !== null ? username.trim() : '';
-    const nameString = name !== null && name.trim();
-    const emailString = email !== null && email.trim();
+    const nameString = name !== null ? name.trim() : '';
+    const emailString = email !== null ? email.trim() : '';
 
     const token = localStorage.getItem('token_ev');
     if (!token) {
@@ -105,7 +110,6 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
     };
     const config = {
       headers: {
-        "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`
       }
     }
@@ -118,17 +122,20 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       formData.append('email', emailString);
       formData.append('description', descriptionString);
       formData.append('social', JSON.stringify(social));
-      formData.append('image', image);
+      if (image && typeof image !== 'string') {
+        formData.append('image', image);
+      }
 
       const url = `/users/${id}`;
       const { data } = await clientAxios.put(url, formData, config);
       messageNotification('image-alert', '');
       messageNotification('send', 'Perfil Actualizado Correctamente');
       setAuth(data);
+      setProfile(data);
       setSuccess(true);
       setLoadingPage(false)
     } catch (error) {
-      const { message } = (error as ErrorResponse).response.data;
+      const message = getErrorMessage(error);
       if (message === 'Este correo ya está registrado') {
         messageNotification('email', message);
         messageNotification('send', 'Hubo un error con el correo');
@@ -168,8 +175,8 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
       messageNotification('send', data.message)
     } catch (error) {
       console.clear();
-      const { message } = (error as ErrorResponse).response.data;
-      if (message == "Lo siento, la contraseña que ha ingresado no es correcta.") {
+      const message = getErrorMessage(error);
+      if (message === "Lo siento, la contraseña que ha ingresado no es correcta.") {
         messageNotification('password', message);
       } else {
         messageNotification('send', 'Hubo un error');

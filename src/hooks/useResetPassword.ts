@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from 'react';
 import { useGlobal } from "./useGlobal";
-import { ErrorResponse } from "types/types";
+import { getErrorMessage } from "../helpers/getErrorMessage";
 import { clientAxios } from "../config/axios";
 
 export function useResetPassword() {
@@ -25,7 +25,7 @@ export function useResetPassword() {
       setSuccess(true);
       setEmail('');
     } catch (error) {
-      const { message } = (error as ErrorResponse).response.data;
+      const message = getErrorMessage(error);
       console.clear();
       setSuccess(false);
       messageNotification('resetPassword', message);

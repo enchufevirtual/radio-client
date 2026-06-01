@@ -22,7 +22,7 @@ export const LoginChat = () => {
 
   return (
     <ContainerLogin ref={dragLoginChat}>
-      <ImageClose onClick={setCloseLoginChat} src={Close} alt="Close Login" />
+      <ImageClose onClick={setCloseLoginChat} src={Close} alt="Cerrar" />
       <div className='DraggableLoginChat'></div>
       <GroupInput className='LoginChat'>
         <Label>Iniciar sesión</Label>
@@ -35,7 +35,7 @@ export const LoginChat = () => {
           placeholder="Correo electrónico"
           onChange={e => setEmail(e.target.value)}
         />
-         <Input
+        <Input
           type="password"
           id='password'
           name='password'
@@ -44,7 +44,7 @@ export const LoginChat = () => {
           onChange={e => setPassword(e.target.value)}
         />
         <GroupButtons>
-          <Link to='/register'>Registrarse</Link>
+          <Link to='/register'>Sign up</Link>
           <button type='button' onClick={handleLogin}>Acceder</button>
         </GroupButtons>
       </GroupInput>

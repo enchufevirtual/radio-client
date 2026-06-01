@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobal } from "./useGlobal";
-import { ErrorResponse } from "types/types";
 import { clientAxios } from "../config/axios";
+import { getErrorMessage } from "../helpers/getErrorMessage";
 import { useAuth } from "./useAuth";
 import { useMediaQuery } from "./useMediaQuery";
 import { ZINDEX_LOADING, OPEN_CHAT } from "../../src/context/constants";
@@ -22,6 +22,7 @@ export function useUser() {
     const token = localStorage.getItem('token_ev');
 
     if (!token) {
+      setLoadingPage(false);
       return null;
     };
     const config = {
@@ -52,7 +53,7 @@ export function useUser() {
       navigate(`/${data.username ?? modifiedUsername + '-' + id}`);
       setLoadingPage(false);
     } catch (error) {
-      const { message } = (error as ErrorResponse).response.data;
+      const message = getErrorMessage(error);
       setUserExists(false);
     } finally {
       setLoadingPage(false);

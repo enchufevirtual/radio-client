@@ -6,7 +6,7 @@ export const OPACITY: string = '#00000099';
 export const NAV_COLOR: string = '#21262d';
 export const DEFAULT_COLOR: string = '#f0f6fc';
 export const SELECT_DEFAULT_COLOR: string = '#1E4273';
-export const DEFAULT_BLUE: string = '#00FFFF';
+export const DEFAULT_BLUE: string = '#58a6ff';
 export const DEFAULT_BLUE_HOVER: string = '#00CCCC';
 
 export const BG_FORM: string = '#21262d';
