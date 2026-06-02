@@ -77,7 +77,12 @@ export const Radio = () => {
           </MarqueeContainer>
         </AdminDetails>
       </DjRadioDetails>
-      <audio onEnded={handlePlay} ref={audioRef} />
+      <audio 
+        onEnded={handlePlay} 
+        ref={audioRef}
+        crossOrigin="anonymous"
+        preload="auto"
+      />
       <ContainerPlayVolume className='box'>
         <PlayPause aria-label='PlayPause' type='button' onClick={() => toggleAudio()}>
             <span className={play ? "play active" : "play"}></span>

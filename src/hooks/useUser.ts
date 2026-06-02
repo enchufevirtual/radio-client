@@ -6,36 +6,39 @@ import { getErrorMessage } from "../helpers/getErrorMessage";
 import { useAuth } from "./useAuth";
 import { useMediaQuery } from "./useMediaQuery";
 import { ZINDEX_LOADING, OPEN_CHAT } from "../../src/context/constants";
+import { Auth } from "../context/types";
 
 export function useUser() {
-  const navigate = useNavigate()
-  const [userId, setUserId] = useState(null);
+  const navigate = useNavigate();
+  const [userId, setUserId] = useState<number | null>(null);
   const [userExists, setUserExists] = useState(true);
+  const [userProfile, setUserProfile] = useState<Auth | null>(null);
 
-  const match = useMediaQuery('(min-width: 768px)')
+  const match = useMediaQuery('(min-width: 768px)');
 
   const { dispatch } = useGlobal();
-  const { setProfile, setLoadingPage } = useAuth();
+  const { setLoadingPage } = useAuth();
 
-  async function handleUser(username: string): Promise<void> {
-    dispatch({type: ZINDEX_LOADING, payload: 8})
+    async function handleUser(username?: string): Promise<void> {
+        if (!username) return;
+    dispatch({type: ZINDEX_LOADING, payload: 8});
     const token = localStorage.getItem('token_ev');
 
     if (!token) {
       setLoadingPage(false);
-      return null;
-    };
+      return;
+    }
     const config = {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       }
-    }
+    };
 
     try {
       let id;
 
-       if (username.includes(" ")) {
+      if (username.includes(" ")) {
         const parts = username.split(" ");
         id = parts[parts.length - 1].replace(/\s/g, "");
       } else if (username.includes("-")) {
@@ -44,17 +47,24 @@ export function useUser() {
       } else {
         id = username;
       }
+
       setLoadingPage(true);
       const { data } = await clientAxios(`/users/${id.toLowerCase()}`, config);
       setUserExists(true);
-      setProfile(data);
-      setUserId(data.id)
+      setUserProfile(data);
+      setUserId(data.id);
       const modifiedUsername = data.name.replace(/\s+/g, "-");
-      navigate(`/${data.username ?? modifiedUsername + '-' + id}`);
-      setLoadingPage(false);
+          navigate(`/${data.username ?? modifiedUsername + '-' + id}`, { replace: true });
     } catch (error) {
       const message = getErrorMessage(error);
       setUserExists(false);
+      setUserProfile(null);
+      // Navigate to explicit 404 page when API indicates the user does not exist
+      try {
+        navigate('/404', { replace: true });
+      } catch (e) {
+        // ignore navigation errors
+      }
     } finally {
       setLoadingPage(false);
       // if (!match)  dispatch({type: OPEN_CHAT, payload: false})
@@ -63,7 +73,7 @@ export function useUser() {
   return {
     handleUser,
     userId,
-    userExists
-  }
-
+    userExists,
+    userProfile
+  };
 }

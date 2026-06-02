@@ -31,35 +31,36 @@ const App = (): JSX.Element => {
         <AuthProvider>
           <SocketProvider>
             <PostProvider>
-            <Routes>
-              <Route element={<AuthLayout />}>
-                {routes.map(({ component: Component, url }) => (
-                  <Route key={url} path={url}
-                    element={
-                    !token
-                      ? <Component />
-                      : <Navigate to='/' replace />
-                    }
-                  />
-                ))}
+              <Routes>
+                <Route element={<AuthLayout />}>
+                  {routes.map(({ component: Component, url }) => (
+                    <Route key={url} path={url}
+                      element={
+                      !token
+                        ? <Component />
+                        : <Navigate to='/' replace />
+                      }
+                    />
+                  ))}
                 </Route>
               <Route path='/' element={<UserLayout />}>
                 <Route index element={<Home />} />
                 <Route element={<ProtectedRoute roles={['user', 'admin']} />}>
-                  <Route path='/:username' element={<Profile />} />
-                  <Route path='/settings' element={<Settings />}>
-                    <Route index element={<SettingsProfile />} />
-                    <Route path='profile' element={<SettingsProfile />} />
-                    <Route path='security' element={<SettingsSecurity />} />
+                    <Route path='/settings' element={<Settings />}>
+                      <Route index element={<SettingsProfile />} />
+                      <Route path='profile' element={<SettingsProfile />} />
+                      <Route path='security' element={<SettingsSecurity />} />
+                    </Route>
+                    <Route path='/:username' element={<Profile />} />
                   </Route>
-                </Route>
-                <Route path='/admin' element={
-                  <ProtectedRoute roles={['admin']} >
-                    <Admin />
-                  </ProtectedRoute>}
-                />
-              </Route>
-              <Route path='*' element={<NotFound />} />
+                  <Route path='/admin' element={
+                    <ProtectedRoute roles={['admin']} >
+                      <Admin />
+                    </ProtectedRoute>}
+                  />
+                  </Route>
+                  <Route path='/404' element={<NotFound />} />
+                  <Route path='*' element={<NotFound />} />
             </Routes>
             </PostProvider>
           </SocketProvider>

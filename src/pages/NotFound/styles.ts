@@ -9,9 +9,10 @@ export const ContainerNotFound = styled.div`
   align-items: center;
   gap: 1rem;
   width: 100%;
-  max-width: 500px;
-  height: 50vh;
-  margin-top: 70px;
+  max-width: 600px;
+  min-height: calc(100vh - 50px);
+  margin: 0 auto;
+  padding-top: 60px;
 `;
 
 export const ButtonHome = styled(Link)`

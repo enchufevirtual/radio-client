@@ -4,10 +4,10 @@ import { MainUser } from "./styles";
 import { Nav } from "../components/nav";
 import { Footer } from "../components/footer";
 import { Radio } from "../components/radio";
+import { Chat } from "../components/chat/Chat";
 import { useGlobal } from "../hooks/useGlobal";
 import { useAuth } from "../hooks/useAuth";
 import { Loading } from "../components/loadings/Loading";
-import { Chat } from "../components/chat/Chat";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 
 export const UserLayout = (): JSX.Element => {
@@ -30,10 +30,10 @@ export const UserLayout = (): JSX.Element => {
   return (
     <>
       <MainUser>
+        <Radio />
         { loadingPage && <Loading /> }
         <Nav />
         <Outlet />
-        <Radio />
         { openChat ? <Chat /> : null }
         {isFooter && <Footer />}
       </MainUser>

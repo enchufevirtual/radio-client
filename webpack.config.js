@@ -9,7 +9,7 @@ module.exports = (env) => {
 
     entry: './src/index.tsx',
     output: {
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(__dirname, 'build'),
       filename: 'index.js',
       clean: true,
       publicPath: '/',
@@ -50,14 +50,19 @@ module.exports = (env) => {
         favicon: path.resolve(__dirname, 'src/public/assets/favicon.ico'),
       }),
       new Dotenv({
-        path: './.env'
+        path: './.env',
+        systemvars: true
       }),
       new CopyPlugin({
         patterns: [
           {
             from: path.resolve(__dirname, '_redirects'),
             to: './',
-          }
+          },
+          {
+            from: path.resolve(__dirname, 'src', 'public', '404.html'),
+            to: path.resolve(__dirname, 'build', '404.html'),
+          },
         ]
     }),
     ],

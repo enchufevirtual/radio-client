@@ -39,6 +39,33 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
     }
 
     let socketInstance: any = null;
+    let historyTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const handleHistory = (history: Messages[]) => {
+      console.info('[Socket] chat:history received, count=', history?.length);
+      if (historyTimer) {
+        clearTimeout(historyTimer);
+        historyTimer = null;
+      }
+      setMessages(history);
+      setLoadingChat(false);
+      setConnectionStatus('connected');
+    };
+
+    const handleMessage = (message: Messages) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    };
+
+    const handleError = (error: { message: string }) => {
+      if (error?.message) {
+        messageNotification('server', error.message);
+      }
+    };
+
+    const handleUsersOnline = (data: { count: number }) => {
+      setUsersOnline(data.count);
+    };
+
     try {
       socketInstance = io(process.env.BACKEND_URL, {
         transports: ["polling", "websocket"],
@@ -46,27 +73,51 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
         reconnectionAttempts: 5,
         timeout: 10000,
       });
-      // debug logs to help trace connection issues across tabs
+
       socketInstance.on('connect', () => {
         console.info('[Socket] connected', socketInstance.id);
         setConnectionStatus('connected');
+        socketInstance.emit('chat:get-users-online');
       });
+
       socketInstance.on('connect_error', (err: any) => {
         console.error('[Socket] connect_error', err);
         setConnectionStatus('error');
         setLoadingChat(false);
       });
+
       socketInstance.on('connect_timeout', (err: any) => {
         console.error('[Socket] connect_timeout', err);
         setConnectionStatus('error');
         setLoadingChat(false);
       });
+
       socketInstance.on('disconnect', (reason: any) => {
         console.info('[Socket] disconnected', reason);
         if (reason !== 'io client disconnect') {
           setConnectionStatus('error');
         }
       });
+
+      historyTimer = setTimeout(() => {
+        console.warn('[Socket] chat:history not received within timeout, hiding loader');
+        setLoadingChat(false);
+        historyTimer = null;
+      }, 5000);
+
+      socketInstance.on('chat:history', handleHistory);
+      socketInstance.on('chat:message', handleMessage);
+      socketInstance.on('chat:error', handleError);
+      socketInstance.on('chat:users-online', handleUsersOnline);
+      socketInstance.on('connect_error', (_err: any) => {
+        setConnectionStatus('error');
+        setLoadingChat(false);
+      });
+      socketInstance.on('connect_timeout', (_err: any) => {
+        setConnectionStatus('error');
+        setLoadingChat(false);
+      });
+
       setSocket(socketInstance);
     } catch (error) {
       console.error("Error al conectarse al socket:", error);
@@ -74,8 +125,16 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
     }
 
     return () => {
+      if (historyTimer) clearTimeout(historyTimer);
       if (socketInstance) {
-        socketInstance.off();
+        socketInstance.off('chat:history', handleHistory);
+        socketInstance.off('chat:message', handleMessage);
+        socketInstance.off('chat:error', handleError);
+        socketInstance.off('chat:users-online', handleUsersOnline);
+        socketInstance.off('connect_error');
+        socketInstance.off('connect_timeout');
+        socketInstance.off('connect');
+        socketInstance.off('disconnect');
         socketInstance.disconnect();
       }
     };
@@ -120,65 +179,6 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
       inputRef.current.focus();
     }
   }
-
-  useEffect(() => {
-    if (!socket) return () => {};
-
-    let historyTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const handleHistory = (history: Messages[]) => {
-      console.info('[Socket] chat:history received, count=', history?.length);
-      if (historyTimer) {
-        clearTimeout(historyTimer);
-        historyTimer = null;
-      }
-      setMessages(history);
-      setLoadingChat(false);
-      setConnectionStatus('connected');
-    };
-
-    const handleMessage = (message: Messages) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    };
-
-    const handleError = (error: { message: string }) => {
-      if (error?.message) {
-        messageNotification('server', error.message);
-      }
-    };
-
-    const handleUsersOnline = (data: { count: number }) => {
-      setUsersOnline(data.count);
-    };
-
-    // if history doesn't arrive in 5s, stop loading to avoid permanent spinner
-    historyTimer = setTimeout(() => {
-      console.warn('[Socket] chat:history not received within timeout, hiding loader');
-      setLoadingChat(false);
-      historyTimer = null;
-    }, 5000);
-
-    socket.on('chat:history', handleHistory);
-    socket.on('chat:message', handleMessage);
-    socket.on('chat:error', handleError);
-    socket.on('chat:users-online', handleUsersOnline);
-    socket.on('connect_error', (_err: any) => {
-      setConnectionStatus('error');
-      setLoadingChat(false);
-    });
-    socket.on('connect_timeout', (_err: any) => {
-      setConnectionStatus('error');
-      setLoadingChat(false);
-    });
-
-    return () => {
-      if (historyTimer) clearTimeout(historyTimer);
-      socket.off('chat:history', handleHistory);
-      socket.off('chat:message', handleMessage);
-      socket.off('chat:error', handleError);
-      socket.off('chat:users-online', handleUsersOnline);
-    };
-  }, [socket]);
 
   useEffect(() => {
     setLoadingChat(true);

@@ -15,7 +15,7 @@ export const Settings = (): JSX.Element => {
   return (
     <ContainerSettings onLoad={handleFooter}>
       <Nav>
-        <Link to="/settings/profile"><i className='fas fa-user'></i>Perfil Público</Link>
+        <Link to="/profile"><i className='fas fa-user'></i>Perfil Público</Link>
         <Link to="/settings/security"><i className='fas fa-edit'></i>Contraseña</Link>
       </Nav>
       <ContainerOutlet>

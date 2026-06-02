@@ -1,14 +1,22 @@
 {
-  "name": "app-ev-frontend",
-  "version": "1.0.0",
+  "name": "radio.enchufevirtual.com",
+  "version": "2.0.0",
+  "homepage": "https://radio.enchufevirtual.com",
+  "private": false,
   "description": "Radio Manager - Enchufe Virtual",
+  "author": {
+    "name": "Jorge Del Pezo",
+    "email": "chendoec@live.com",
+    "url": "https://soychendo.com"
+  },
   "main": "/src/index.tsx",
   "scripts": {
+    "predeploy": "npm run build && echo radio.enchufevirtual.com > ./build/CNAME",
+    "deploy": "gh-pages -d build",
     "start": "webpack serve --open --mode development",
     "build": "webpack --mode production",
     "dev": "webpack --mode development"
   },
-  "author": "soychendo",
   "license": "ISC",
   "dependencies": {
     "@emoji-mart/data": "^1.1.2",
@@ -17,6 +25,7 @@
     "axios": "^1.3.5",
     "dotenv": "^16.0.3",
     "emoji-mart": "^5.5.2",
+    "gh-pages": "^6.3.0",
     "randomcolor": "^0.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -46,7 +55,7 @@
     "html-loader": "^4.2.0",
     "html-webpack-plugin": "^5.5.0",
     "typescript": "^5.0.4",
-    "webpack": "^5.78.0",
+    "webpack": "^5.107.2",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.13.2"
   }

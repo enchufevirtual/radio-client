@@ -84,7 +84,7 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
       setPosts(data.posts)
       setSendPost(false)
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
   // Intersection Observer, Query Post

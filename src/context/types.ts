@@ -36,7 +36,7 @@ interface InputTypes {
   email: string,
   password: string,
   repeatPassword: string,
-  image: string
+  image: string | File | null
 }
 
 export interface GLOBAL_ACTION {
