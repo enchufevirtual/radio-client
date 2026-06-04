@@ -11,22 +11,10 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
 
   const { auth, invalidToken } = useAuth();
   const { messageNotification, dispatch, inputRef } = useGlobal();
-  const [socket, setSocket] = useState(null);
   const socketRef = useRef<any>(null);
 
   const [isInputEmpty, setIsInputEmpty] = useState(false);
 
-  const getClientId = () => {
-    const key = 'radio-ev-client-id';
-    let clientId = localStorage.getItem(key);
-    if (!clientId) {
-      clientId = typeof crypto !== 'undefined' && (crypto as any).randomUUID
-        ? (crypto as any).randomUUID()
-        : `client-${Math.random().toString(36).slice(2, 12)}`;
-      localStorage.setItem(key, clientId);
-    }
-    return clientId;
-  };
 
   // Loading Chat
   const [loadingChat, setLoadingChat] = useState(true);
@@ -51,7 +39,6 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
     }
 
     let historyTimer: ReturnType<typeof setTimeout> | null = null;
-    let pollUsersOnlineTimer: ReturnType<typeof setInterval> | null = null;
 
     const token = localStorage.getItem('token_ev');
     const shouldSendToken = Boolean(auth?.id && token);
@@ -60,7 +47,6 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
       console.info('[Socket] Connecting as guest; token ignored until auth is present');
     }
 
-    const clientId = getClientId();
 
     // ============ Event Handlers ============
 
@@ -136,7 +122,6 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
       });
 
       socketRef.current = socketInstance;
-      setSocket(socketInstance);
 
       // ============ Connection Events ============
       socketInstance.on('connect', () => {
@@ -149,12 +134,6 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
 
       socketInstance.on('connect_error', (err: any) => {
         console.error('[Socket] connect_error:', err?.message);
-        setConnectionStatus('error');
-        setLoadingChat(false);
-      });
-
-      socketInstance.on('connect_timeout', (err: any) => {
-        console.error('[Socket] connect_timeout:', err?.message);
         setConnectionStatus('error');
         setLoadingChat(false);
       });
@@ -173,10 +152,6 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
         socketInstance.emit('chat:get-users-online');
       });
 
-      socketInstance.on('reconnect_error', (err: any) => {
-        console.error('[Socket] reconnect_error:', err?.message);
-      });
-
       // ============ Attach Event Listeners (BEFORE historyTimer) ============
       socketInstance.on('chat:history', handleHistory);
       socketInstance.on('chat:message', handleMessage);
@@ -191,15 +166,6 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
         historyTimer = null;
       }, 5000);
 
-      // ============ Periodic Users Online Polling ============
-      // Refresh users online count every 30 seconds to ensure sync
-      pollUsersOnlineTimer = setInterval(() => {
-        if (socketInstance?.connected) {
-          console.debug('[Socket] polling users online count');
-          socketInstance.emit('chat:get-users-online');
-        }
-      }, 30000); // 30 seconds
-
     } catch (error) {
       console.error('[Socket] Error initializing socket:', error);
       setLoadingChat(false);
@@ -212,53 +178,61 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
         clearTimeout(historyTimer);
         historyTimer = null;
       }
-      if (pollUsersOnlineTimer) {
-        clearInterval(pollUsersOnlineTimer);
-        pollUsersOnlineTimer = null;
-      }
       cleanupSocket();
     };
-  }, [auth?.id, auth]);
+  }, [auth?.id]);
 
 
   // Socket Chat
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const token = localStorage.getItem('token_ev');
-    if (!token) {
-      setAllowed(false);
-      dispatch({type: CLOSE_LOGIN_CHAT, payload: false})
-      return;
-    };
-    if (invalidToken === 'Invalid Token') {
-      localStorage.removeItem("token_ev");
-      setAllowed(false);
-      return;
-    }
+  const token = localStorage.getItem('token_ev');
 
-    if ( message.trim() === '' ) {
-      setIsInputEmpty(true);
-    } else {
-      setIsInputEmpty(false);
-      if (!socket) {
-        messageNotification('server', 'Chat no disponible. Recarga la página.');
-        return;
-      }
-
-      const newMessage = {
-        from: auth.username,
-        name: auth.name,
-        body: message,
-        image: auth.image,
-        userId: auth.id,
-        createAt: new Date()
-      }
-      socket.emit('chat:send', newMessage);
-      setMessage('');
-      inputRef.current.focus();
-    }
+  if (!token) {
+    setAllowed(false);
+    dispatch({ type: CLOSE_LOGIN_CHAT, payload: false });
+    return;
   }
+
+  if (invalidToken === 'Invalid Token') {
+    localStorage.removeItem('token_ev');
+    setAllowed(false);
+    return;
+  }
+
+  if (message.trim() === '') {
+    setIsInputEmpty(true);
+    return;
+  }
+
+  setIsInputEmpty(false);
+
+  if (!socketRef.current) {
+    messageNotification(
+      'server',
+      'Chat no disponible. Recarga la página.'
+    );
+    return;
+  }
+
+  const newMessage = {
+    from: auth.username,
+    name: auth.name,
+    body: message,
+    image: auth.image,
+    userId: auth.id,
+    createAt: new Date()
+  };
+
+  socketRef.current.emit('chat:send', newMessage);
+
+  setMessage('');
+
+  if (inputRef.current) {
+    inputRef.current.focus();
+  }
+};
 
   useEffect(() => {
     setLoadingChat(true);
@@ -278,7 +252,7 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
         image: auth.image,
       };
     }));
-  }, [auth?.id, auth?.username, auth?.name, auth?.image]);
+  }, [ auth?.id, auth?.username, auth?.name,  auth?.image ]);
 
   const value = {
     messages,

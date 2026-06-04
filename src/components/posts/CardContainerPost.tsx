@@ -38,7 +38,7 @@ export const CardContainerPost = ({allAllowedPost}: AllAllowedPost): JSX.Element
       {dataCard}
       {loadingPosts && (
         <>
-          {Array.from({ length: 3 }).map((_, index) => (
+          {Array.from({ length: 4 }).map((_, index) => (
             <SkeletonCard key={`skeleton-${index}`}>
               <SkeletonHeader>
                 <SkeletonCircle />

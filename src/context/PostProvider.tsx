@@ -24,9 +24,8 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
   const [hasMoreResults, setHasMoreResults] = useState(false);
   const [closeImage, setCloseImage] = useState(false);
   const [closeAudio, setCloseAudio] = useState(false);
-  const [nextQuery, setNextQuery] = useState({limit: 4})
-  const [loadingPosts, setLoadingPosts] = useState(true);
-  const [ isVisible, setIsVisible ] = useState(false);
+  const [nextQuery, setNextQuery] = useState({limit: 4, offset: 0});
+  const [loadingPosts, setLoadingPosts] = useState(false);
   let lastCard: Element | null;
 
   const formRef = useRef(null);
@@ -73,31 +72,52 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
     });
   }
 
-  const dataPosts = async () => {
-    try {
-      setLoadingPosts(true);
-      const { limit } = nextQuery;
-      let limitQuery = ""
+      const dataPosts = async () => {
 
-      if (limit) {
-        limitQuery = `?limit=${limit}`
+      if (loadingPosts) return;
+
+      try {
+        setLoadingPosts(true);
+
+        const { limit, offset } = nextQuery;
+        console.log('Fetching', nextQuery);
+
+        const { data } = await clientAxios(
+          `/posts?limit=${limit}&offset=${offset}`
+        );
+        console.log(
+          'offset:',
+          offset,
+          'posts:',
+          data.posts.length,
+          'hasMore:',
+          data.hasMoreResults
+        );
+
+        setHasMoreResults(data.hasMoreResults);
+
+        if (offset === 0) {
+          setPosts(data.posts);
+        } else {
+          setPosts(prev => [...prev, ...data.posts]);
+        }
+
+        setSendPost(false);
+
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoadingPosts(false);
       }
-      const { data } = await clientAxios(`/posts${limitQuery}`);
-      setHasMoreResults(data.hasMoreResults)
-      setPosts(data.posts)
-      setSendPost(false)
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setLoadingPosts(false);
-    }
-  }
+    };
 
   // ============ Infinite Scroll with IntersectionObserver ============
-  // Se ejecuta SOLO cuando nextQuery.limit cambia
+  // Se ejecuta SOLO cuando nextQuery.offset cambia
+  const firstLoadRef = useRef(true);
+
   useEffect(() => {
     dataPosts();
-  }, [nextQuery.limit])
+  }, [nextQuery.offset, nextQuery.limit]);
 
   // Se ejecuta SOLO cuando se envía un nuevo post
   useEffect(() => {
@@ -107,12 +127,21 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
   }, [sendPost])
 
   const callbackFunction = (entries: IntersectionObserverEntry[]) => {
-    const [ entry ] = entries
-    setIsVisible(entry.isIntersecting)
-  }
+  const [entry] = entries;
+
+    if (
+      entry.isIntersecting &&
+      !loadingPosts &&
+      hasMoreResults &&
+      posts.length > 0
+    ) {
+      handleQuery();
+    }
+  };
+
   const options = {
-    rootMargin: "0px",
-    threshold: 1.0
+    rootMargin: "100px",
+    threshold: 0
   }
   useEffect(() => {
     const observer = new IntersectionObserver(callbackFunction, options);
@@ -126,15 +155,16 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
     }
   }, [posts.length])
 
-  const handleQuery = () => {
-    const currentLimit = nextQuery.limit;
-    setNextQuery({limit: currentLimit + 3})
-  }
+   const handleQuery = () => {
+    setNextQuery(prev => ({
+      ...prev,
+      offset: prev.offset + prev.limit
+    }));
+  };
 
-  // Handle Query
-  useEffect(() => {
-    if (isVisible) handleQuery();
-  }, [isVisible])
+    // Handle Query
+
+  
   const handleShowForm = () => {
     setShowForm(true);
 

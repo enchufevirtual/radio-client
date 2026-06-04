@@ -7,6 +7,7 @@ export interface ErrorResponse {
 }
 
 export interface ErrorRequest {
+  status: number;
   message: string;
 }
 

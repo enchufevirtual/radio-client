@@ -244,6 +244,7 @@ export interface PostContextProps {
   }
   nextQuery: {
     limit: number,
+    offset: number
   },
   setNextQuery: React.Dispatch<React.SetStateAction<NextQuery>>,
   loadingPosts: boolean,

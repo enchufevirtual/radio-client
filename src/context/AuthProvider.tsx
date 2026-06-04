@@ -28,7 +28,6 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
 
   const [auth, setAuth] = useHandleState<Auth>(initialState);
   const [profile, setProfile] = useState<Auth>(initialState);
-  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingPage, setLoadingPage] = useState(true);
   const [invalidToken, setInvalidToken] = useState('');
@@ -38,57 +37,69 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
   const { messageNotification } = useGlobal();
 
   async function authUser() {
-    const token = localStorage.getItem('token_ev');
-    if (!token) {
-      setLoadingPage(false);
-      setLoading(false);
-      return;
-    };
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      }
-    }
-    try {
-      setLoadingPage(true)
-      const { data } = await clientAxios('/users/profile', config);
-      setAuth(data);
-      setProfile(data);
-    } catch (error) {
-      const errorMsg = error as ErrorRequest;
-      if (errorMsg.message === "Network Error") {
-        localStorage.removeItem('token_ev');
-        setAuth(null);
-        setProfile(null);
-        return;
-      }
-      const message = getErrorMessage(error);
-      const isAuthError = message === 'Invalid Token' || message === 'Token inválido' || errorMsg.status === 401;
-      if (isAuthError) {
-        localStorage.removeItem('token_ev');
-        location.href = '/';
-        setInvalidToken(message);
-      } else {
-        setInvalidToken('');
-      }
-      setAuth(null);
-      setProfile(null);
-    } finally {
-      setLoadingPage(false);
-      setLoading(false);
-    }
+  const token = localStorage.getItem('token_ev');
+
+  if (!token) {
+    setLoadingPage(false);
+    setLoading(false);
+    return;
   }
 
-  useEffect(() => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    }
+  };
 
-    if (!mounted) {
-      setMounted(true);
+  try {
+    setLoadingPage(true);
+
+    const { data } = await clientAxios('/users/profile', config);
+
+    setAuth(data);
+    setProfile(data);
+    setInvalidToken('');
+
+  } catch (error) {
+
+    const errorMsg = error as ErrorRequest;
+    const message = getErrorMessage(error);
+
+    const isAuthError =
+      message === 'Invalid Token' ||
+      message === 'Token inválido' ||
+      errorMsg.status === 401;
+
+    // SOLO cerrar sesión cuando el token realmente sea inválido
+    if (isAuthError) {
+      console.warn('[AUTH] Invalid token. Logging out user.');
+
+      localStorage.removeItem('token_ev');
+
+      setAuth(null);
+      setProfile(null);
+      setInvalidToken(message);
+
+      location.href = '/';
       return;
     }
 
+    // Cualquier otro error NO debe cerrar sesión
+    console.error('[AUTH] Failed to load profile:', error);
+
+    // Mantener token y estado actual
+    setInvalidToken('');
+
+  } finally {
+    setLoadingPage(false);
+    setLoading(false);
+  }
+}
+
+  useEffect(() => {
     authUser();
-  }, [mounted]);
+  }, []);
 
   const logOut = () => {
     localStorage.removeItem('token_ev');
