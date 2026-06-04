@@ -10,7 +10,7 @@ import { getAvatarUrl } from '../../helpers/getAvatarUrl';
 
 export const PostAccess = (): JSX.Element => {
 
-  const { previewImage, previewAudio, handleFile } = useGlobal();
+  const { previewImage, previewAudio, handleFile, messageNotification } = useGlobal();
   const { auth } =  useAuth();
   const { handleShowForm, setMyPost } = usePost();
   const [mounted, setMounted] = useState(false);
@@ -52,22 +52,12 @@ export const PostAccess = (): JSX.Element => {
           />
         </DisplaySvg>
         <DisplaySvg>
-          <Label onClick={handleShowForm} htmlFor="audio">
+          <Label
+            onClick={() => messageNotification('fileError', 'por ahora no podemos ponernos romanticos')}
+          >
             <AudioSvg />
             <p>Audio</p>
           </Label>
-          <input
-            style={{display: "none"}}
-            type="file"
-            name="audio"
-            id="audio"
-            accept="audio/mpeg, audio/wav, audio/mp3"
-            onChange={(event) =>
-              handleFile(
-                event,
-                setMyPost as StateUpdater<Auth | MyPostTypes>,
-              )}
-          />
         </DisplaySvg>
       </ContainerSvg>
     </PostAccessStyles>

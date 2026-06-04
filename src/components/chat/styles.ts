@@ -48,7 +48,7 @@ export const ContainerMessages = styled.div`
   background-color: rgb(33, 38, 45);
   overflow-y: auto;
   width: auto;
-  height: 84%;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -157,6 +157,7 @@ export const Form = styled.form`
     max-height: 100px !important;
     padding: 0.2em 10px 4px 34px;
     resize: none;
+    line-height: 28px;
     font-size: 14px;
     ::-webkit-scrollbar {
     display: none;

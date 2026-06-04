@@ -33,12 +33,9 @@ export const ContainerLogin = styled.div`
     width: 92%;
     margin-bottom: 0 !important;
   }
-  @media (max-width: 480px) {
-    width: 92%;
-    height: 240px;
-  }
+
   @media (max-width: 310px) {
-    height: 250px;
+    height: 240px;
   }
   #alert {
     position: absolute;
@@ -49,10 +46,7 @@ export const ContainerLogin = styled.div`
     text-align: center;
 
     @media (max-width: 480px) {
-      top: 58px;
-    }
-    @media (max-width: 310px) {
-      top: 45px;
+      top: -1px;
     }
   }
   label {

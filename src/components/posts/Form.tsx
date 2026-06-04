@@ -24,7 +24,7 @@ import { getAvatarUrl } from '../../helpers/getAvatarUrl';
 export const Form = (): JSX.Element => {
 
   const { auth } = useAuth();
-  const { previewImage, handleFile, previewAudio, dispatch } = useGlobal();
+  const { previewImage, handleFile, previewAudio, dispatch, messageNotification } = useGlobal();
 
   const {
     handlePost,
@@ -82,7 +82,7 @@ export const Form = (): JSX.Element => {
                     </>
                   ) : null
                 }
-                { previewAudio?.name ?
+                {/* { previewAudio?.name ?
                   (
                     <ContainerPreviewAudio style={{alignSelf: "flex-center"}}>
                       <img onClick={() => setCloseAudio(true)} src={Close} alt="Cancel Audio" />
@@ -90,7 +90,7 @@ export const Form = (): JSX.Element => {
                       <small>{sizePreviewAudio} MB</small>
                     </ContainerPreviewAudio>
                   ) : null
-                }
+                } */}
                 <ContainerSvgForm style={{alignSelf: "flex-start"}}>
                   <LabelForm htmlFor="image">
                     <ImageSvg />
@@ -107,21 +107,15 @@ export const Form = (): JSX.Element => {
                         )}
                     />
                   </LabelForm>
-                  <LabelForm htmlFor="audio">
+                  {/* <LabelForm
+                    onClick={(e) => {
+                      e.preventDefault();
+                      messageNotification('fileError', 'por ahora no podemos ponernos romanticos');
+                    }}
+                  >
                     <AudioSvg />
-                    <input
-                      type="file"
-                      style={{display: "none"}}
-                      name="audio"
-                      id="audio"
-                      accept="audio/mpeg, audio/wav, audio/mp3"
-                      onChange={(event) =>
-                        handleFile(
-                          event,
-                          setMyPost as StateUpdater<Auth | MyPostTypes>,
-                        )}
-                    />
-                  </LabelForm>
+                    <p>Audio</p>
+                  </LabelForm> */}
                   <p>Inspíranos con tu arte 🎨🎶</p>
                 </ContainerSvgForm>
               </PreviousImage>

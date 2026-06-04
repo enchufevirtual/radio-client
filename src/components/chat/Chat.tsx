@@ -108,7 +108,7 @@ export const Chat = () => {
         {messages.length === 0 ? (
           <EmptyChat>
             {connectionError
-              ? 'No se pudo conectar al chat. Revisa que el backend esté activo.'
+              ? 'No se pudo conectar al chat. Recarga la página si el problema persiste.'
               : isConnecting
                 ? 'Conectando al chat...'
                 : 'Aún no hay mensajes. Disfruta el chat en vivo.'
@@ -138,7 +138,7 @@ export const Chat = () => {
             })
         )}
       </ContainerMessages>
-      {isGuest && <GuestNotice>Inicia sesión para escribir mensajes.</GuestNotice>}
+      {isGuest && <GuestNotice>¿Team frío ❄️ o team calor ☀️? Elige tu bando.🕺</GuestNotice>}
       <UsersOnlineIndicator count={usersOnline} />
       <Form onSubmit={handleSubmit} autoComplete='off'>
         <IconEmoji iconRef={iconRef} handleEmoji={handleEmoji} openEmoji={openEmoji} />
@@ -149,7 +149,7 @@ export const Chat = () => {
           ref={inputRef}
           id='server'
           value={message}
-          placeholder={isGuest ? 'Inicia sesión para escribir...' : 'Mensaje'}
+          placeholder={isGuest ? '¡Conéctate con la comunidad!' : 'Mensaje'}
           onChange={handleInputChange}
           onClick={isGuest ? openLoginPrompt : undefined}
           onFocus={isGuest ? openLoginPrompt : undefined}

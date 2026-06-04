@@ -557,20 +557,21 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     if (!files || !files[0]) return;
 
     const file = files[0];
+
+    // Disable audio uploads temporarily — show friendly message and do not attach the file
+    if (file.type.startsWith('audio/')) {
+      CheckBeforeSend.messageNotification('fileError', 'por ahora no podemos ponernos romanticos');
+      // clear input value so same file can be selected later if needed
+      target.value = '';
+      return;
+    }
+
     const reader = new FileReader();
 
     reader.onload = () => {
       const result = reader.result;
       if (file.type.startsWith('image/')) {
         dispatch({ type: PREVIEW_IMAGE, payload: result });
-      } else if (file.type.startsWith('audio/')) {
-        dispatch({
-          type: PREVIEW_AUDIO,
-          payload: {
-            name: file.name,
-            size: file.size
-          }
-        });
       }
     };
 
