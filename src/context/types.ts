@@ -122,6 +122,7 @@ export type ContextProps = {
   play: boolean;
   isPlaying: boolean;
   audioRef: RefObject<HTMLAudioElement>;
+  setAudioRef: (node: HTMLAudioElement | null) => void;
   isFooter: boolean,
   volumeValue: number,
   handleChat: () => void,
@@ -225,7 +226,6 @@ export type NextQuery = {
 
 export interface PostContextProps {
 
-  handleQuery: () => void,
   handleChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
   handlePost: MouseEventHandler<HTMLFormElement>
   hasMoreResults: boolean,
@@ -246,6 +246,7 @@ export interface PostContextProps {
     limit: number,
   },
   setNextQuery: React.Dispatch<React.SetStateAction<NextQuery>>,
+  loadingPosts: boolean,
   posts: {
     comments: [];
     createAt: string;

@@ -64,9 +64,10 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
         return;
       }
       const message = getErrorMessage(error);
-      if (message === 'Invalid Token') {
+      const isAuthError = message === 'Invalid Token' || message === 'Token inválido' || errorMsg.status === 401;
+      if (isAuthError) {
         localStorage.removeItem('token_ev');
-        location.href = '/'
+        location.href = '/';
         setInvalidToken(message);
       } else {
         setInvalidToken('');

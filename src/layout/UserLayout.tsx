@@ -6,14 +6,11 @@ import { Footer } from "../components/footer";
 import { Radio } from "../components/radio";
 import { Chat } from "../components/chat/Chat";
 import { useGlobal } from "../hooks/useGlobal";
-import { useAuth } from "../hooks/useAuth";
-import { Loading } from "../components/loadings/Loading";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 
 export const UserLayout = (): JSX.Element => {
 
   const { isFooter, openChat } = useGlobal();
-  const { loadingPage } = useAuth();
   const match = useMediaQuery('(min-width: 768px)');
 
   useEffect(() => {
@@ -27,11 +24,11 @@ export const UserLayout = (): JSX.Element => {
     };
   }, [openChat]);
 
+
   return (
     <>
       <MainUser>
         <Radio />
-        { loadingPage && <Loading /> }
         <Nav />
         <Outlet />
         { openChat ? <Chat /> : null }

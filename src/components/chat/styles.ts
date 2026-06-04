@@ -158,11 +158,16 @@ export const Form = styled.form`
     padding: 0.2em 10px 4px 34px;
     resize: none;
     line-height: 28px;
-    font-size: 14px;
+    font-size: 10px;
     ::-webkit-scrollbar {
     display: none;
     @media (max-width: 768px) {
       font-size: 15px;
+
+        @media (max-width: 370px) {
+          font-size: 14px;
+        }
+
     }
   }
   }
@@ -243,4 +248,41 @@ export const PositionAlert = styled.div<Allowed>`
   }
 `;
 
+// ============ Skeleton Styles ============
+export const SkeletonMessageBox = styled.div`
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  background-size: 200% 100%;
+  animation: skeletonLoading 1.2s infinite;
+  border-radius: 4px;
+  padding: 8px;
+  min-height: 50px;
+  width: 100%;
+
+  @keyframes skeletonLoading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+`;
+
+export const SkeletonLine = styled.div<{ width?: string; height?: string }>`
+  height: ${(props) => props.height || '10px'};
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  background-size: 200% 100%;
+  animation: skeletonLoading 1.2s infinite;
+  border-radius: 4px;
+  width: ${(props) => props.width || '100%'};
+
+  @keyframes skeletonLoading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+`;
 

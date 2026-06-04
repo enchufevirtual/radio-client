@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useGlobal } from "./useGlobal";
 import { clientAxios } from "../config/axios";
 import { getErrorMessage } from "../helpers/getErrorMessage";
-import { useAuth } from "./useAuth";
 import { useMediaQuery } from "./useMediaQuery";
-import { ZINDEX_LOADING, OPEN_CHAT } from "../../src/context/constants";
+import { ZINDEX_LOADING } from "../../src/context/constants";
 import { Auth } from "../context/types";
 
 export function useUser() {
@@ -13,11 +12,11 @@ export function useUser() {
   const [userId, setUserId] = useState<number | null>(null);
   const [userExists, setUserExists] = useState(true);
   const [userProfile, setUserProfile] = useState<Auth | null>(null);
+  const [loadingUser, setLoadingUser] = useState(false);
 
   const match = useMediaQuery('(min-width: 768px)');
 
   const { dispatch } = useGlobal();
-  const { setLoadingPage } = useAuth();
 
     async function handleUser(username?: string): Promise<void> {
         if (!username) return;
@@ -25,17 +24,18 @@ export function useUser() {
     const token = localStorage.getItem('token_ev');
 
     if (!token) {
-      setLoadingPage(false);
-      return;
+      // If there is no token, do not force the global page loader for profile lookup.
+      // Depending on your API, the profile call may work without authorization.
     }
     const config = {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: token ? `Bearer ${token}` : undefined,
       }
     };
 
     try {
+      setLoadingUser(true);
       let id;
 
       if (username.includes(" ")) {
@@ -48,7 +48,6 @@ export function useUser() {
         id = username;
       }
 
-      setLoadingPage(true);
       const { data } = await clientAxios(`/users/${id.toLowerCase()}`, config);
       setUserExists(true);
       setUserProfile(data);
@@ -66,7 +65,7 @@ export function useUser() {
         // ignore navigation errors
       }
     } finally {
-      setLoadingPage(false);
+      setLoadingUser(false);
       // if (!match)  dispatch({type: OPEN_CHAT, payload: false})
     }
   }
@@ -74,6 +73,7 @@ export function useUser() {
     handleUser,
     userId,
     userExists,
-    userProfile
+    userProfile,
+    loadingUser
   };
 }

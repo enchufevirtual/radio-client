@@ -1,5 +1,14 @@
 import { DEFAULT_NAV_COLOR, DEFAULT_BLUE, DEFAULT_COLOR, DEFAULT_BG_COLOR } from "../../../src/styles/constants";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const skeletonLoading = keyframes`
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(240px);
+  }
+`;
 
 export const ContainerPosts = styled.div`
 
@@ -57,4 +66,48 @@ export const ButtonNextPrev = styled.button`
   display: inline !important;
   cursor: pointer;
   align-self: center;
+`;
+
+export const SkeletonCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: ${DEFAULT_NAV_COLOR};
+  border-radius: 10px;
+  padding: 1rem;
+  width: 100%;
+  min-height: 140px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150px;
+    width: 120px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    animation: ${skeletonLoading} 1.2s infinite;
+  }
+`;
+
+export const SkeletonHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+export const SkeletonCircle = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0.08);
+`;
+
+export const SkeletonLine = styled.div<{ width?: string; height?: string; }>`
+  width: ${({ width }) => width || '100%'};
+  height: ${({ height }) => height || '14px'};
+  background-color: rgba(255,255,255,0.08);
+  border-radius: 6px;
 `;

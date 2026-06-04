@@ -2,13 +2,13 @@ import React from 'react';
 import { usePost } from '../../../src/hooks/usePost';
 import { CardPostItem } from './CardPostItem';
 import { useAuth } from '../../../src/hooks/useAuth';
-import { NoContent } from './styles';
+import { NoContent, SkeletonCard, SkeletonCircle, SkeletonHeader, SkeletonLine } from './styles';
 
 type AllAllowedPost = { allAllowedPost: boolean}
 
 export const CardContainerPost = ({allAllowedPost}: AllAllowedPost): JSX.Element => {
 
-  const { posts } = usePost();
+  const { posts, loadingPosts } = usePost();
   const { profile } = useAuth();
   let dataCard
 
@@ -29,12 +29,29 @@ export const CardContainerPost = ({allAllowedPost}: AllAllowedPost): JSX.Element
       />
     ))
 
+  if (!filterPost.length && !loadingPosts) {
+    return <NoContent>Aún no hay publicaciones</NoContent>
+  }
+
   return (
     <>
-       { dataCard.length
-        ? dataCard
-        : <NoContent>Aún no hay publicaciones</NoContent>
-       }
+      {dataCard}
+      {loadingPosts && (
+        <>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <SkeletonCard key={`skeleton-${index}`}>
+              <SkeletonHeader>
+                <SkeletonCircle />
+                <SkeletonLine width="40%" />
+              </SkeletonHeader>
+              <SkeletonLine width="80%" />
+              <SkeletonLine width="95%" />
+              <SkeletonLine width="60%" />
+              <SkeletonLine width="100%" height="80px" />
+            </SkeletonCard>
+          ))}
+        </>
+      )}
     </>
   )
 }

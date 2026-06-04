@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { ContainerPosts, ParagraphLogin, ButtonNextPrev } from './styles';
+import React, { useEffect } from 'react';
+import { ContainerPosts, ParagraphLogin, ButtonNextPrev, SkeletonCard, SkeletonCircle, SkeletonHeader, SkeletonLine } from './styles';
 import { CardContainerPost } from '../../../src/components/posts/CardContainerPost';
 import { useAuth } from '../../../src/hooks/useAuth';
 import { usePost } from '../../../src/hooks/usePost';
@@ -11,7 +11,7 @@ type AllAllowedPost = { allAllowedPost: boolean}
 
 export const Posts = ({allAllowedPost}: AllAllowedPost): JSX.Element => {
 
-  const { auth, profile } = useAuth();
+  const { auth, profile, loadingPage } = useAuth();
 
   const {
     hasMoreResults,
@@ -21,29 +21,38 @@ export const Posts = ({allAllowedPost}: AllAllowedPost): JSX.Element => {
     showForm
   } = usePost();
 
-  useEffect(() => {
-    dataPosts();
-  }, [sendPost, nextQuery.limit])
+  const showAuthSkeleton = loadingPage && allAllowedPost;
 
   return (
     <ContainerPosts>
-      {auth?.id && allAllowedPost
+      {showAuthSkeleton ? (
+        <SkeletonCard>
+          <SkeletonHeader>
+            <SkeletonCircle />
+            <SkeletonLine width="45%" />
+          </SkeletonHeader>
+          <SkeletonLine width="90%" />
+          <SkeletonLine width="80%" />
+          <SkeletonLine width="60%" />
+        </SkeletonCard>
+      ) : auth?.id && allAllowedPost ? (
+        <PostAccess />
+      ) : null}
+
+      {auth?.id == profile.id && !allAllowedPost
         ? <PostAccess />
         : null
       }
       {
-        auth?.id == profile.id && !allAllowedPost
-        ? <PostAccess />
-        : null
-      }
-      {
-        auth?.id
+        loadingPage
         ? null
-        : (
-          <ParagraphLogin>
-            <a href="/login">Inicia sesión</a>
-            para comenzar a publicar
-          </ParagraphLogin>
+        : auth?.id
+          ? null
+          : (
+            <ParagraphLogin>
+              <a href="/login">Inicia sesión</a>
+              para comenzar a publicar
+            </ParagraphLogin>
           )
       }
       {showForm && <Form />}

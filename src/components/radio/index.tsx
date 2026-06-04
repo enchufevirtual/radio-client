@@ -10,7 +10,7 @@ import { PLAY, IS_PLAYING } from '../../../src/context/constants';
 
 export const Radio = () => {
 
-  const { toggleAudio, play, audioRef, openChat, handleChat, currentSong, dispatch, streamUrl, currentAudio, audioTitle, playingFrom, switchToRadio } = useGlobal();
+  const { toggleAudio, play, audioRef, setAudioRef, openChat, handleChat, currentSong, dispatch, streamUrl, currentAudio, audioTitle, playingFrom, switchToRadio } = useGlobal();
 
   const [openVolume, setOpenVolume] = useState(false);
   const [mouseOver, setMouseOver] = useState(false);
@@ -79,7 +79,7 @@ export const Radio = () => {
       </DjRadioDetails>
       <audio 
         onEnded={handlePlay} 
-        ref={audioRef}
+        ref={setAudioRef}
         crossOrigin="anonymous"
         preload="auto"
       />

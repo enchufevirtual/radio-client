@@ -6,7 +6,16 @@ import {
   DEFAULT_BG_AUDIO
 } from "../../../src/styles/constants";
 import { CssButton } from "../../../src/styles/Form/styles";
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
+
+const skeletonLoading = keyframes`
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(240px);
+  }
+`;
 
 export const PostAccessStyles = styled.div`
   display: flex;
@@ -382,4 +391,48 @@ export const NoContent = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+export const SkeletonCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: ${DEFAULT_BG_AUDIO};
+  border-radius: 10px;
+  padding: 1rem;
+  width: 100%;
+  min-height: 160px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150px;
+    width: 120px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    animation: ${skeletonLoading} 1.2s infinite;
+  }
+`;
+
+export const SkeletonLine = styled.div<{width?: string; height?: string;}>`
+  width: ${({ width }) => width || '100%'};
+  height: ${({ height }) => height || '14px'};
+  background-color: rgba(255,255,255,0.08);
+  border-radius: 6px;
+`;
+
+export const SkeletonHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+export const SkeletonCircle = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0.08);
 `;

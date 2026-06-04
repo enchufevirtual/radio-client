@@ -1,12 +1,21 @@
 import { Link } from "react-router-dom";
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import { COLOR_CONTAINER } from "../../styles/constants";
 import { CssButton } from "../../styles/Form/styles";
 
-export const ContainerProfile = styled.div`
+const skeletonLoading = keyframes`
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(240px);
+  }
+`;
+
+export const ContainerProfile = styled.div<{ hasTopMargin?: boolean }>`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin-top: 70px;
+  margin-top: ${({ hasTopMargin }) => (hasTopMargin ?? true ? '70px' : '0')};
   width: 900px;
   max-width: 100%;
   gap: 14px;
@@ -22,6 +31,7 @@ export const ContainerInfoProfile= styled.div`
   display: flex;
   flex-direction: column;
   max-width: 100%;
+  margin-top: 70px;
   gap: 1rem;
   @media (max-width: 991px) {
     width: 500px;
@@ -29,7 +39,6 @@ export const ContainerInfoProfile= styled.div`
 `;
 export const ContainerPostProfile= styled.div`
   display: flex;
-  margin-top: -70px;
   align-self: flex-start;
   @media (max-width: 991px) {
     max-width: 100%;
@@ -81,4 +90,52 @@ export const ButtonEditProfile = styled(Link)`
   ${css`${CssButton}`}
   text-decoration: none;
   width: fit-content;
+`;
+
+export const SkeletonCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: ${COLOR_CONTAINER};
+  border-radius: 10px;
+  margin-top: -70px;
+  padding: 1rem;
+  width: 100%;
+  min-height: 140px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150px;
+    width: 120px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    animation: ${skeletonLoading} 1.2s infinite;
+  }
+`;
+export const SkeletonNoMarginCard = styled(SkeletonCard)`
+  margin-top: 0 !important;
+`;
+
+export const SkeletonHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+export const SkeletonCircle = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0.08);
+`;
+
+export const SkeletonLine = styled.div<{ width?: string; height?: string; }>`
+  width: ${({ width }) => width || '100%'};
+  height: ${({ height }) => height || '14px'};
+  background-color: rgba(255,255,255,0.08);
+  border-radius: 6px;
 `;

@@ -225,7 +225,15 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
 
   // Config Radio Ev
   let audioRef = useRef<null | HTMLMediaElement>(null);
+  const lastAudioElementRef = useRef<HTMLAudioElement | null>(null);
   const shouldBePlayingRef = useRef(false);
+
+  const setAudioRef = (node: HTMLAudioElement | null): void => {
+    audioRef.current = node;
+    if (node) {
+      lastAudioElementRef.current = node;
+    }
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -342,13 +350,14 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   };
 
   const onPause = (): void => {
-    const audio = audioRef.current;
+    const audio = audioRef.current || lastAudioElementRef.current;
     if (!audio) return;
 
+    // Mark user intent to stop before pausing to avoid recovery logic
+    shouldBePlayingRef.current = false;
     audio.pause();
     dispatch({type: PLAY, payload: false});
     dispatch({type: IS_PLAYING, payload: false});
-    shouldBePlayingRef.current = false;
   };
 
   const toggleAudio = async (src?: string, audioTitle?: string): Promise<void> => {
@@ -589,6 +598,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
 
   const radio = {
     audioRef,
+    setAudioRef,
     currentAudio: state.currentAudio,
     volume,
     volumeValue: state.volumeValue,

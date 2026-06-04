@@ -10,7 +10,12 @@ import {
   ContainerSocial,
   AccountCreationDate,
   ButtonEditProfile,
-  ContainerPostProfile
+  ContainerPostProfile,
+  SkeletonCard,
+  SkeletonNoMarginCard,
+  SkeletonHeader,
+  SkeletonCircle,
+  SkeletonLine
 } from './styles';
 import { Social } from '../../components/profile/Social';
 import { formatDate } from '../../helpers/formatDate';
@@ -29,7 +34,7 @@ export const Profile = () => {
   const { profile, auth } = useAuth();
   const { dispatch } = useGlobal();
 
-  const { handleUser, userId, userExists, userProfile } = useUser();
+  const { handleUser, userId, userExists, userProfile, loadingUser } = useUser();
 
   const routeId = useMemo(() => {
     if (!sanitizedUsername) return null;
@@ -51,8 +56,28 @@ export const Profile = () => {
 
   const selectedProfile = userProfile ?? (isOwnRoute ? profile : null);
 
-  if (!selectedProfile && userExists) {
-    return <div>Cargando perfil...</div>;
+  if (loadingUser) {
+    return (
+      <ContainerProfile>
+        <ContainerInfoProfile>
+          <SkeletonCard>
+            <SkeletonHeader>
+              <SkeletonCircle />
+              <SkeletonLine width="40%" />
+            </SkeletonHeader>
+            <SkeletonLine width="80%" />
+            <SkeletonLine width="95%" />
+            <SkeletonLine width="60%" />
+          </SkeletonCard>
+        </ContainerInfoProfile>
+        <ContainerPostProfile>
+          <SkeletonNoMarginCard>
+            <SkeletonLine width="90%" />
+            <SkeletonLine width="100%" height="120px" />
+          </SkeletonNoMarginCard>
+        </ContainerPostProfile>
+      </ContainerProfile>
+    )
   }
 
   if (!selectedProfile) return null;
@@ -61,12 +86,18 @@ export const Profile = () => {
   const url = getAvatarUrl(image, name);
 
   const socialmedia = selectedProfile.social
-    ? Object.entries(selectedProfile.social)
-        .filter(([key, value]) => key !== "createAt" &&
-          key !== "id" &&
-          key !== "userId" &&
-          value !== null
-        ).map(([key, value]) => <Social key={key} property={key} value={value} />)
+    ? (Object.keys(selectedProfile.social) as Array<keyof typeof selectedProfile.social>)
+        .filter((key) => {
+          const value = selectedProfile.social?.[key];
+          return value !== undefined && value !== null && value !== '';
+        })
+        .map((key) => (
+          <Social
+            key={key}
+            property={key}
+            value={selectedProfile.social?.[key] ?? ''}
+          />
+        ))
     : null;
 
 
@@ -78,7 +109,7 @@ export const Profile = () => {
   if (!userExists) return <NotFound />
 
   return (
-    <ContainerProfile onLoad={handleFooter}>
+    <ContainerProfile hasTopMargin={!auth.id} onLoad={handleFooter}>
       <ContainerInfoProfile>
         <ContainerImage>
           <img src={url} alt="Perfil" />

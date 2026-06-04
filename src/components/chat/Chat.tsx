@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef, ChangeEventHandler } from 'react'
-import { ChatStyle, BodyMessage, ContainerMessages, Form, ContainerUserChat, ContainerEmojis, GuestNotice, EmptyChat } from './styles';
+import { ChatStyle, BodyMessage, ContainerMessages, Form, ContainerUserChat, ContainerEmojis, GuestNotice, EmptyChat, SkeletonMessageBox, SkeletonLine } from './styles';
 import { IconEmoji } from './IconEmoji';
 import { Emojis } from './Emojis';
 import randomColor from 'randomcolor';
 import { LoginChat } from './LoginChat';
-import { LoadingChat } from '../loadings/LoadingChat';
 import { UsersOnlineIndicator } from './UsersOnlineIndicator';
 import { useSocket } from '../../hooks/useSocket';
 import { useGlobal } from '../../hooks/useGlobal';
@@ -103,8 +102,25 @@ export const Chat = () => {
 
   return (
     <ChatStyle style={{zIndex: menuNav ? 8 : 11}}>
-      { showLoading && <LoadingChat /> }
-      <ContainerMessages ref={containerRef} className="container">
+      {/* Skeleton Loading para el chat */}
+      {showLoading && (
+        <ContainerMessages style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px' }}>
+          {[1, 2, 3].map((i) => (
+            <SkeletonMessageBox key={`skeleton-message-${i}`}>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(90deg, #e0e0e0, #f0f0f0, #e0e0e0)', backgroundSize: '200% 100%', animation: 'skeletonLoading 1.2s infinite' }} />
+                <div style={{ flex: 1 }}>
+                  <SkeletonLine width="60%" height="12px" style={{ marginBottom: '4px' }} />
+                  <SkeletonLine width="80%" height="10px" />
+                </div>
+              </div>
+            </SkeletonMessageBox>
+          ))}
+        </ContainerMessages>
+      )}
+      {!showLoading && (
+        <>
+          <ContainerMessages ref={containerRef} className="container">
         {messages.length === 0 ? (
           <EmptyChat>
             {connectionError
@@ -167,6 +183,8 @@ export const Chat = () => {
         />
       }
       </ContainerEmojis>
+        </>
+      )}
     </ChatStyle>
   )
 }

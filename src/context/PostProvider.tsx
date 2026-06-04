@@ -25,8 +25,10 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
   const [closeImage, setCloseImage] = useState(false);
   const [closeAudio, setCloseAudio] = useState(false);
   const [nextQuery, setNextQuery] = useState({limit: 4})
+  const [loadingPosts, setLoadingPosts] = useState(true);
   const [ isVisible, setIsVisible ] = useState(false);
-  let lastCard: Element
+  let lastCard: Element | null;
+
   const formRef = useRef(null);
   const textAreaRef = useRef(null);
   const { auth } = useAuth();
@@ -73,6 +75,7 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
 
   const dataPosts = async () => {
     try {
+      setLoadingPosts(true);
       const { limit } = nextQuery;
       let limitQuery = ""
 
@@ -85,9 +88,24 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
       setSendPost(false)
     } catch (error) {
       console.error(error)
+    } finally {
+      setLoadingPosts(false);
     }
   }
-  // Intersection Observer, Query Post
+
+  // ============ Infinite Scroll with IntersectionObserver ============
+  // Se ejecuta SOLO cuando nextQuery.limit cambia
+  useEffect(() => {
+    dataPosts();
+  }, [nextQuery.limit])
+
+  // Se ejecuta SOLO cuando se envía un nuevo post
+  useEffect(() => {
+    if (sendPost) {
+      dataPosts();
+    }
+  }, [sendPost])
+
   const callbackFunction = (entries: IntersectionObserverEntry[]) => {
     const [ entry ] = entries
     setIsVisible(entry.isIntersecting)
@@ -106,20 +124,17 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
     return () => {
       if (lastCard) observer.unobserve(lastCard);
     }
-  }, [lastCard, options])
+  }, [posts.length])
 
   const handleQuery = () => {
-    // current limit & offset
     const currentLimit = nextQuery.limit;
-
     setNextQuery({limit: currentLimit + 3})
   }
+
   // Handle Query
   useEffect(() => {
     if (isVisible) handleQuery();
   }, [isVisible])
-
-  // show post form when called
   const handleShowForm = () => {
     setShowForm(true);
 
@@ -194,7 +209,6 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
   const value = {
     handleChange,
     handlePost,
-    handleQuery,
     hasMoreResults,
     handleShowForm,
     setShowForm,
@@ -211,7 +225,8 @@ export const PostProvider = ({children}: GlobalProviderTypes) => {
     sendPost,
     setNextQuery,
     myPost,
-    posts
+    posts,
+    loadingPosts
   }
 
   return (
