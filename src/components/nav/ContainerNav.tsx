@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { MenuProfile } from './menu';
 import { ContainerStyle } from './styles';
 import { useAuth } from '../../hooks/useAuth';
@@ -14,9 +14,6 @@ const ContainerNav = (): JSX.Element => {
   const { dispatch, menuNav } = useGlobal();
   const imgRef = useRef(null);
   const truncatedName = name.length > 30 ? name.slice(0, 30) + '...' : name;
-
-  const api = process.env.API_AVATAR;
-  const key = process.env.API_KEY;
 
   const url = getAvatarUrl(image, name);
 

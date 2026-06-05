@@ -295,11 +295,8 @@ export const PostContent = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  padding: 1rem;
   width: 100%;
-
-  p {
-    margin-left: 1rem;
-  }
 `;
 
 export const ContainerSvg = styled.div`

@@ -39,7 +39,7 @@ export const Posts = ({allAllowedPost}: AllAllowedPost): JSX.Element => {
         <PostAccess />
       ) : null}
 
-      {auth?.id == profile.id && !allAllowedPost
+      {auth?.id == profile?.id && !allAllowedPost
         ? <PostAccess />
         : null
       }

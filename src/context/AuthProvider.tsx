@@ -26,8 +26,8 @@ export const AuthProvider = ({children}: GlobalProviderTypes) => {
     }
   }
 
-  const [auth, setAuth] = useHandleState<Auth>(initialState);
-  const [profile, setProfile] = useState<Auth>(initialState);
+  const [auth, setAuth] = useHandleState<Auth | null>(null);
+const [profile, setProfile] = useState<Auth | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingPage, setLoadingPage] = useState(true);
   const [invalidToken, setInvalidToken] = useState('');
