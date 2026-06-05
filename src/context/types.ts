@@ -211,7 +211,8 @@ export interface SocketContextProps {
   setAllowed: React.Dispatch<React.SetStateAction<boolean>>,
   loadingChat: boolean,
   connectionStatus: 'connecting' | 'connected' | 'error',
-  usersOnline: number
+  usersOnline: number,
+  guestsOnline: number,
 }
 
 export type MyPostTypes = {

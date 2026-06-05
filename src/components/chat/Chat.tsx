@@ -22,7 +22,22 @@ export const Chat = () => {
   const emojiContainerRef = useRef(null);
   const [userColors, setUserColors] = useState<Record<string, string>>({});
 
-  const { messages, handleSubmit, setMessage, message, isInputEmpty, lastMessageRef, containerRef, allowed, loadingChat, setAllowed, connectionStatus, usersOnline } = useSocket();
+  const { 
+    messages, 
+    handleSubmit, 
+    setMessage, 
+    message, 
+    isInputEmpty, 
+    lastMessageRef, 
+    containerRef, 
+    allowed, 
+    loadingChat, 
+    setAllowed, 
+    connectionStatus, 
+    usersOnline,
+    guestsOnline
+
+  } = useSocket();
   const isGuest = !auth?.id;
   const isConnecting = loadingChat && messages.length === 0;
   const showLoading = loadingChat && !isGuest;
@@ -155,7 +170,7 @@ export const Chat = () => {
         )}
       </ContainerMessages>
       {isGuest && <GuestNotice>¿Team frío ❄️ o team calor ☀️? Elige tu bando.🕺</GuestNotice>}
-      <UsersOnlineIndicator count={usersOnline} />
+      <UsersOnlineIndicator count={usersOnline} guestsCount={guestsOnline} />
       <Form onSubmit={handleSubmit} autoComplete='off'>
         <IconEmoji iconRef={iconRef} handleEmoji={handleEmoji} openEmoji={openEmoji} />
         {!allowed && !closeLoginChat &&

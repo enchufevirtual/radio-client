@@ -22,6 +22,8 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
   const [allowed, setAllowed] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'error'>('connecting');
   const [usersOnline, setUsersOnline] = useState(0);
+  // === NUEVO: Estado para almacenar los oyentes invitados ===
+  const [guestsOnline, setGuestsOnline] = useState(0);
 
   // Chat Messages
   const [message, setMessage] = useState('');
@@ -73,9 +75,12 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
       }
     };
 
-    const handleUsersOnline = (data: { count: number }) => {
-      console.debug('[Socket] users-online count:', data.count);
+    const handleUsersOnline = (data: { count: number; guestsCount?: number }) => {
+      console.debug('[Socket] users-online count:', data.count, 'guests:', data.guestsCount);
       setUsersOnline(data.count);
+      if (typeof data.guestsCount === 'number') {
+        setGuestsOnline(data.guestsCount);
+      }
     };
 
     const handleUserImageUpdated = (data: { userId: number; avatarUrl: string }) => {
@@ -267,6 +272,7 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
     loadingChat,
     connectionStatus,
     usersOnline,
+    guestsOnline,
   }
 
   return (
