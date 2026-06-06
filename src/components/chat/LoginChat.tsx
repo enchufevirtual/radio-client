@@ -11,7 +11,7 @@ import { CLOSE_LOGIN_CHAT } from '../../../src/context/constants';
 
 export const LoginChat = () => {
 
-  const { email, password, setEmail, setPassword, handleLogin } = useLoginChat();
+  const { loginValue, password, setLoginValue, setPassword, handleLogin } = useLoginChat();
   const { dispatch } = useGlobal();
   const dragLoginChat = useRef<HTMLDivElement>(null);
   useDraggable(dragLoginChat, 'DraggableLoginChat');
@@ -28,12 +28,12 @@ export const LoginChat = () => {
         <Label>Iniciar sesión</Label>
         <AlertMessage data={{id: 'alert'}} />
         <Input
-          type="email"
-          id='email'
-          name='email'
-          value={email}
-          placeholder="Correo electrónico"
-          onChange={e => setEmail(e.target.value)}
+          type="text"
+          id='login'
+          name='login'
+          value={loginValue}
+          placeholder="Usuario o correo"
+          onChange={e => setLoginValue(e.target.value)}
         />
         <Input
           type="password"

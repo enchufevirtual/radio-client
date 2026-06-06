@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import type { FormEventHandler } from 'react';
 import io from 'socket.io-client';
 import { SocketContext } from "./SocketContext";
@@ -10,7 +10,7 @@ import { CLOSE_LOGIN_CHAT } from "./constants";
 export const SocketProvider = ({children}: GlobalProviderTypes) => {
 
   const { auth, invalidToken } = useAuth();
-  const { messageNotification, dispatch, inputRef } = useGlobal();
+  const { messageNotification, dispatch, inputRef, openChat } = useGlobal();
   const socketRef = useRef<any>(null);
 
   const [isInputEmpty, setIsInputEmpty] = useState(false);
@@ -31,6 +31,12 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
   // Audio Player
   const lastMessageRef = useRef(null);
   const containerRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (openChat) {
+      setAllowed(true);
+    }
+  }, [openChat]);
 
   // Socket Fetch & Initialization
   useEffect(() => {

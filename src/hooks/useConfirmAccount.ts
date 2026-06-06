@@ -6,12 +6,14 @@ import { getErrorMessage } from "../helpers/getErrorMessage";
 
 export function useConfirmAccount() {
 
-  const [success, setSuccess] = useState(false);
-  const [mounted, setMounted] = useState(false)
+  const [success, setSuccess] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(true);
   const { messageNotification } = useGlobal();
   const { id } = useParams();
 
   async function confirmAccount() {
+    setLoading(true);
+
     try {
       const { data } = await clientAxios(`/users/confirm/${id}`);
       messageNotification('send', data.message);
@@ -21,18 +23,18 @@ export function useConfirmAccount() {
       console.clear();
       messageNotification('send', message);
       setSuccess(false);
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    if (!mounted) {
-      setMounted(true);
-      return
-    }
+    if (!id) return;
     confirmAccount();
-  }, [id, mounted])
+  }, [id]);
 
   return {
-    success
+    success,
+    loading
   }
 }
