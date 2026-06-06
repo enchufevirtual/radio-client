@@ -25,6 +25,9 @@ import {
   AUDIO_TITLE,
 } from "./constants";
 
+// Allow accessing `process.env` which is injected by the bundler at build time.
+declare const process: any;
+
 export const GlobalProvider = ({children}: GlobalProviderTypes) => {
 
   const initialState: GLOBAL_STATE = {
@@ -231,7 +234,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   };
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval> | null = null;
 
     const getCurrentSong = async () => {
       try {
@@ -260,7 +263,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     getCurrentSong();
     interval = setInterval(getCurrentSong, 5000);
 
-    return () => clearInterval(interval);
+    return () => { if (interval) clearInterval(interval); };
   }, []);
 
   const getAudioSource = (src: string): string => {
@@ -486,7 +489,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       return undefined;
     }
 
-    let unexpectedPauseTimeout: NodeJS.Timeout;
+    let unexpectedPauseTimeout: ReturnType<typeof setTimeout> | null = null;
 
     const handlePlayEvent = () => {
       dispatch({type: PLAY, payload: true});
@@ -531,15 +534,26 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       dispatch({type: IS_PLAYING, payload: false});
     };
 
-    const handleVisibilityChange = () => {
-      if (document.hidden) return;
-      if (!audio) return;
-      if (audio.paused && state.play) {
-        shouldBePlayingRef.current = false;
-        dispatch({type: PLAY, payload: false});
-        dispatch({type: IS_PLAYING, payload: false});
-      }
-    };
+    const syncAudioState = () => {
+        if (!audio) return;
+
+        const actuallyPlaying =
+          !audio.paused &&
+          !audio.ended &&
+          audio.readyState > 2;
+
+        dispatch({
+          type: PLAY,
+          payload: actuallyPlaying
+        });
+
+        dispatch({
+          type: IS_PLAYING,
+          payload: actuallyPlaying
+        });
+
+        shouldBePlayingRef.current = actuallyPlaying;
+      };
 
     audio.volume = state.volumeValue / 100;
     audio.addEventListener('play', handlePlayEvent);
@@ -547,11 +561,12 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     audio.addEventListener('ended', handlePauseEvent);
     audio.addEventListener('error', handleErrorEvent);
     audio.addEventListener('suspend', handleSuspendEvent);
+    document.addEventListener('visibilitychange', syncAudioState);
 
     // Synchronize state when the page regains visibility or focus on mobile/desktop.
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    const handleFocus = () => setTimeout(handleVisibilityChange, 200);
-    const handlePageShow = () => setTimeout(handleVisibilityChange, 200);
+    document.addEventListener('visibilitychange', syncAudioState);
+    const handleFocus = () => setTimeout(syncAudioState, 200);
+    const handlePageShow = () => setTimeout(syncAudioState, 200);
     window.addEventListener('focus', handleFocus);
     window.addEventListener('pageshow', handlePageShow);
 
@@ -562,11 +577,11 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       audio.removeEventListener('ended', handlePauseEvent);
       audio.removeEventListener('error', handleErrorEvent);
       audio.removeEventListener('suspend', handleSuspendEvent);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener('visibilitychange', syncAudioState);
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('pageshow', handlePageShow);
     };
-  }, [state.volumeValue, state.play]);
+  }, [state.volumeValue]);
 
   // Chat
   const handleChat = () => {
