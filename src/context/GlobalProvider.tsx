@@ -222,7 +222,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   let check = new CheckBeforeSend(username, email, password, repeatPassword);
 
   // Config Radio Ev
-  let audioRef = useRef<null | HTMLMediaElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastAudioElementRef = useRef<HTMLAudioElement | null>(null);
   const shouldBePlayingRef = useRef(false);
 
@@ -545,7 +545,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       dispatch({type: IS_PLAYING, payload: false});
     };
 
-    const syncAudioState = () => {
+      const syncAudioState = () => {
         if (!audio) return;
 
         const actuallyPlaying =
@@ -565,7 +565,6 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
 
         shouldBePlayingRef.current = actuallyPlaying;
       };
-
     audio.volume = state.volumeValue / 100;
     audio.addEventListener('play', handlePlayEvent);
     audio.addEventListener('pause', handlePauseEvent);
