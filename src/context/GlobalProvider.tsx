@@ -492,11 +492,22 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     let unexpectedPauseTimeout: ReturnType<typeof setTimeout> | null = null;
 
     const handlePlayEvent = () => {
-      dispatch({type: PLAY, payload: true});
-      dispatch({type: IS_PLAYING, payload: true});
-      shouldBePlayingRef.current = true;
-      // Clear any pending retry
-      if (unexpectedPauseTimeout) clearTimeout(unexpectedPauseTimeout);
+      const actuallyPlaying =
+        !audio.paused &&
+        !audio.ended &&
+        audio.readyState > 2;
+
+      dispatch({
+        type: PLAY,
+        payload: actuallyPlaying
+      });
+
+      dispatch({
+        type: IS_PLAYING,
+        payload: actuallyPlaying
+      });
+
+      shouldBePlayingRef.current = actuallyPlaying;
     };
 
     const handlePauseEvent = () => {

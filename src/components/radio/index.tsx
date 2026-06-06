@@ -84,6 +84,9 @@ export const Radio = () => {
         preload="auto"
       />
       <ContainerPlayVolume className='box'>
+        <div>
+          Estado: {play ? 'PLAYING' : 'PAUSED'}
+        </div>
         <PlayPause aria-label='PlayPause' type='button' onClick={() => toggleAudio()}>
             <span className={play ? "play active" : "play"}></span>
             <span className={play ? "pause active" : "pause"}></span>
