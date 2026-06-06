@@ -13,11 +13,11 @@ export const LoginChat = () => {
 
   const { email, password, setEmail, setPassword, handleLogin } = useLoginChat();
   const { dispatch } = useGlobal();
-  const dragLoginChat = useRef(null);
+  const dragLoginChat = useRef<HTMLDivElement>(null);
   useDraggable(dragLoginChat, 'DraggableLoginChat');
 
   const setCloseLoginChat = () => {
-    dispatch({type: CLOSE_LOGIN_CHAT, payload: true})
+    dispatch({ type: CLOSE_LOGIN_CHAT, payload: true });
   }
 
   return (

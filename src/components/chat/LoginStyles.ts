@@ -12,14 +12,12 @@ export const ContainerLogin = styled.div`
   width: 210px;
   max-width: 90%;
   height: 200px;
-  inset: 0px;
-  margin: 0 auto;
   position: absolute;
   top: 50%;
   left: 50%;
   overflow: hidden;
-  transform: translate(-50%, -50%);
   padding: 0;
+  transform: translate(-50%, -50%);
 
   .DraggableLoginChat {
     position: absolute;
@@ -28,6 +26,10 @@ export const ContainerLogin = styled.div`
     width: 100%;
     height: 24px;
     cursor: grab;
+    touch-action: none;
+    user-select: none;
+    z-index: 2;
+    background: transparent;
   }
   .LoginChat {
     width: 92%;
