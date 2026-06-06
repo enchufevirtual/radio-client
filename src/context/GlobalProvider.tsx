@@ -10,15 +10,11 @@ import {
   CURRENT_AUDIO,
   INPUT,
   SUCCESS,
-  IS_FOOTER,
   VOLUME_VALUE,
   OPEN_CHAT,
   CLOSE_LOGIN_CHAT,
-  MENU_NAV,
   PREVIEW_IMAGE,
-  PREVIEW_AUDIO,
   PLAY,
-  ZINDEX_LOADING,
   CURRENT_SONG,
   IS_PLAYING,
   ZENO_API,
@@ -27,7 +23,6 @@ import {
   STREAM_URL,
   PLAYING_FROM,
   AUDIO_TITLE,
-  SWITCH_TO_RADIO
 } from "./constants";
 
 export const GlobalProvider = ({children}: GlobalProviderTypes) => {
@@ -502,21 +497,9 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     };
 
     const handlePauseEvent = () => {
-      // Check if this is an unexpected pause
-      if (shouldBePlayingRef.current) {
-        console.warn('Unexpected pause detected! Audio was supposed to be playing');
-        // Attempt to resume after a short delay
-        unexpectedPauseTimeout = setTimeout(() => {
-          if (shouldBePlayingRef.current && audio.src) {
-            audio.play().catch(err => {
-              console.error('Recovery attempt failed:', err);
-              dispatch({type: PLAY, payload: false});
-              dispatch({type: IS_PLAYING, payload: false});
-              shouldBePlayingRef.current = false;
-            });
-          }
-        }, 300);
-      }
+      // When the audio element is paused by an external source (e.g. phone voice recording,
+      // browser audio focus changes), do not force resume automatically.
+      shouldBePlayingRef.current = false;
       dispatch({type: PLAY, payload: false});
       dispatch({type: IS_PLAYING, payload: false});
     };
@@ -526,10 +509,36 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       dispatch({type: PLAY, payload: false});
       dispatch({type: IS_PLAYING, payload: false});
       shouldBePlayingRef.current = false;
+
+      if (audio.src) {
+        unexpectedPauseTimeout = setTimeout(() => {
+          if (shouldBePlayingRef.current || !audio.src) return;
+          audio.load();
+          audio.play().catch(err => {
+            console.error('Recovery after audio error failed:', err);
+            dispatch({type: PLAY, payload: false});
+            dispatch({type: IS_PLAYING, payload: false});
+            shouldBePlayingRef.current = false;
+          });
+        }, 1000);
+      }
     };
 
     const handleSuspendEvent = () => {
       console.warn('Audio suspend event - stream may have paused unexpectedly');
+      shouldBePlayingRef.current = false;
+      dispatch({type: PLAY, payload: false});
+      dispatch({type: IS_PLAYING, payload: false});
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) return;
+      if (!audio) return;
+      if (audio.paused && state.play) {
+        shouldBePlayingRef.current = false;
+        dispatch({type: PLAY, payload: false});
+        dispatch({type: IS_PLAYING, payload: false});
+      }
     };
 
     audio.volume = state.volumeValue / 100;
@@ -539,6 +548,13 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     audio.addEventListener('error', handleErrorEvent);
     audio.addEventListener('suspend', handleSuspendEvent);
 
+    // Synchronize state when the page regains visibility or focus on mobile/desktop.
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    const handleFocus = () => setTimeout(handleVisibilityChange, 200);
+    const handlePageShow = () => setTimeout(handleVisibilityChange, 200);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('pageshow', handlePageShow);
+
     return () => {
       if (unexpectedPauseTimeout) clearTimeout(unexpectedPauseTimeout);
       audio.removeEventListener('play', handlePlayEvent);
@@ -546,13 +562,16 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       audio.removeEventListener('ended', handlePauseEvent);
       audio.removeEventListener('error', handleErrorEvent);
       audio.removeEventListener('suspend', handleSuspendEvent);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('pageshow', handlePageShow);
     };
-  }, [state.volumeValue]);
+  }, [state.volumeValue, state.play]);
 
   // Chat
   const handleChat = () => {
     dispatch({type: OPEN_CHAT});
-    dispatch({type: CLOSE_LOGIN_CHAT});
+    dispatch({type: CLOSE_LOGIN_CHAT, payload: false});
   }
 
   // Handle of all files

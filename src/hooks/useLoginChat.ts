@@ -1,63 +1,24 @@
-import { useEffect, useState } from "react";
-import { useGlobal } from "./useGlobal";
-import { clientAxios } from "../config/axios";
-import { getErrorMessage } from "../helpers/getErrorMessage";
-import { useAuth } from "./useAuth";
+import { useLoginForm } from "./useLoginForm";
 import { useSocket } from "./useSocket";
+import { useAuth } from "./useAuth";
 
 export function useLoginChat() {
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { messageNotification } = useGlobal();
   const { setAllowed } = useSocket();
+  const { authUser } = useAuth();
 
-  const { setAuth, authUser } = useAuth();
-
-  useEffect(() => {
-    messageNotification('alert', '');
-  }, [email, password]);
-
-  async function handleLogin() {
-
-    if (!email.trim()) {
-      return messageNotification('alert', 'Ingrese su correo');
-    } else if (!isEmail(email)) {
-      return messageNotification('alert', 'Use un correo válido');
-    }
-    if (password === '') {
-      return messageNotification('alert', 'Ingrese su password');
-    }
-    function isEmail(email: string): boolean {
-      return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email);
-    }
-
-    try {
-      const { data } = await  clientAxios.post('/users/login', { email, password });
-      localStorage.setItem('token_ev', data.token);
-      setAuth(data);
+  const { loginValue, password, setLoginValue, setPassword, handleLogin } = useLoginForm({
+    alertFieldId: 'alert',
+    onSuccess: () => {
       setAllowed(true);
       authUser();
-    } catch (error) {
-      const message = getErrorMessage(error);
-      console.clear();
-      if (message === 'Esta cuenta no existe') {
-        messageNotification('alert', message);
-      }
-      if (message === 'Tu cuenta no ha sido confirmada') {
-        messageNotification('alert', message);
-      }
-      if (message === 'Lo siento, la contraseña que ha ingresado no es correcta.') {
-        messageNotification('alert', 'Contraseña incorrecta');
-      }
-    }
-  }
+    },
+  });
 
   return {
-    email,
+    loginValue,
     password,
-    setEmail,
+    setLoginValue,
     setPassword,
-    handleLogin
-  }
+    handleLogin,
+  };
 }

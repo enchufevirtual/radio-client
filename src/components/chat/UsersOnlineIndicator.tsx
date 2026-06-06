@@ -45,7 +45,7 @@ export const UsersOnlineIndicator: React.FC<UsersOnlineIndicatorProps> = ({ coun
       <Label>En el Chat</Label>
       <Span> | </Span>
       <GuestsCount>🎧 {count + guestsCount} </GuestsCount>
-      <Label>Oyentes</Label>
+      <Label>{count + guestsCount === 1 ? "Oyente" : "Oyentes"}</Label>
     </Container>
   );
 };

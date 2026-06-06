@@ -8,13 +8,19 @@ import { SuccessMessage } from "./SuccessMessage";
 
 export const ConfirmAccount = (): JSX.Element => {
 
-  const { success } = useConfirmAccount();
+  const { success, loading } = useConfirmAccount();
 
   return (
     <InfoContainer>
-      <AlertMessage data={{id: 'send', success: success}} />
+      <AlertMessage data={{ id: 'send', success: success ?? undefined }} />
       <br />
-      { !success ? <ErrorMessage /> :  <SuccessMessage /> }
+      {loading ? (
+        <p>Verificando enlace...</p>
+      ) : success ? (
+        <SuccessMessage />
+      ) : (
+        <ErrorMessage />
+      )}
     </InfoContainer>
   )
 }

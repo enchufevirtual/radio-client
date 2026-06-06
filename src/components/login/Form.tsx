@@ -19,11 +19,12 @@ export const Form = (): JSX.Element => {
     <FormStyles onSubmit={handleSubmit} autoComplete="off" >
       <AlertMessage data={{id: 'send'}} />
       <GroupInput >
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">Usuario o correo</Label>
         <Input
-          type="email"
+          type="text"
           id='email'
           name='email'
+          placeholder='Usuario o correo'
           value={email}
           onChange={e => setEmail(e.target.value)}
         />

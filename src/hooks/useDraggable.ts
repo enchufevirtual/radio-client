@@ -124,6 +124,11 @@ export const useDraggable = (
       }
 
       if ('touches' in event && event.touches.length > 1) return;
+
+      const rawTarget = (event.target as HTMLElement) || null;
+      const targetElement = rawTarget?.closest(`.${targetAllowed}`) as HTMLElement | null;
+      if (!targetElement) return;
+
       const isTouchEvent = 'touches' in event;
       const isPointerTouchEvent =
         !isTouchEvent && 'pointerType' in event && event.pointerType === 'touch';
@@ -131,10 +136,6 @@ export const useDraggable = (
       if ((isTouchEvent || isPointerTouchEvent) && event.cancelable) {
         event.preventDefault();
       }
-
-      const rawTarget = (event.target as HTMLElement) || null;
-      const targetElement = rawTarget?.closest(`.${targetAllowed}`) as HTMLElement | null;
-      if (!targetElement) return;
 
       const container = getContainer();
       const containerRect = container.getBoundingClientRect();

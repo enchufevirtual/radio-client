@@ -38,8 +38,15 @@ export const Chat = () => {
     guestsOnline
 
   } = useSocket();
+
   const isGuest = !auth?.id;
   const isConnecting = loadingChat && messages.length === 0;
+
+  useEffect(() => {
+    if (!isGuest && !allowed) {
+      setAllowed(true);
+    }
+  }, [isGuest, allowed, setAllowed]);
   const showLoading = loadingChat && !isGuest;
   const connectionError = connectionStatus === 'error';
 
@@ -169,11 +176,11 @@ export const Chat = () => {
             })
         )}
       </ContainerMessages>
-      {isGuest && <GuestNotice>¿Team frío ❄️ o team calor ☀️? Elige tu bando.🕺</GuestNotice>}
+      {isGuest && <GuestNotice>¿Team frío ❄️ o team calor ☀️?</GuestNotice>}
       <UsersOnlineIndicator count={usersOnline} guestsCount={guestsOnline} />
       <Form onSubmit={handleSubmit} autoComplete='off'>
         <IconEmoji iconRef={iconRef} handleEmoji={handleEmoji} openEmoji={openEmoji} />
-        {!allowed && !closeLoginChat &&
+        {isGuest && !allowed && !closeLoginChat &&
           <LoginChat />
         }
         <textarea
