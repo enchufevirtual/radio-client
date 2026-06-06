@@ -571,25 +571,35 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     audio.addEventListener('ended', handlePauseEvent);
     audio.addEventListener('error', handleErrorEvent);
     audio.addEventListener('suspend', handleSuspendEvent);
-    document.addEventListener('visibilitychange', syncAudioState);
 
     // Synchronize state when the page regains visibility or focus on mobile/desktop.
     document.addEventListener('visibilitychange', syncAudioState);
-    const handleFocus = () => setTimeout(syncAudioState, 200);
-    const handlePageShow = () => setTimeout(syncAudioState, 200);
-    window.addEventListener('focus', handleFocus);
-    window.addEventListener('pageshow', handlePageShow);
+    const handleVisibilityRestore = () => {
+      syncAudioState();
+      setTimeout(syncAudioState, 200);
+      setTimeout(syncAudioState, 600);
+      setTimeout(syncAudioState, 1200);
+    };
+    window.addEventListener('focus', handleVisibilityRestore);
+    window.addEventListener('pageshow', handleVisibilityRestore);
+    window.addEventListener('blur', handleVisibilityRestore);
+    window.addEventListener('pagehide', handleVisibilityRestore);
+
+    const pollInterval = setInterval(syncAudioState, 500);
 
     return () => {
       if (unexpectedPauseTimeout) clearTimeout(unexpectedPauseTimeout);
+      clearInterval(pollInterval);
       audio.removeEventListener('play', handlePlayEvent);
       audio.removeEventListener('pause', handlePauseEvent);
       audio.removeEventListener('ended', handlePauseEvent);
       audio.removeEventListener('error', handleErrorEvent);
       audio.removeEventListener('suspend', handleSuspendEvent);
       document.removeEventListener('visibilitychange', syncAudioState);
-      window.removeEventListener('focus', handleFocus);
-      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('focus', handleVisibilityRestore);
+      window.removeEventListener('pageshow', handleVisibilityRestore);
+      window.removeEventListener('blur', handleVisibilityRestore);
+      window.removeEventListener('pagehide', handleVisibilityRestore);
     };
   }, [state.volumeValue]);
 

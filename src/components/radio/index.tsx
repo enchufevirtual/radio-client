@@ -16,43 +16,11 @@ export const Radio = () => {
   const textRef = useRef(null);
   const volumeLogoRef = useRef(null);
   const containerVolumeRef = useRef(null);
-  const [actualPlaying, setActualPlaying] = useState(false);
-
   const match = useMediaQuery('(min-width: 991px)');
 
   useEffect(() => {
     textRef.current.style.animationPlayState = 'running';
   }, []);
-  useEffect(() => {
-  const syncAudioState = () => {
-    const audio = audioRef.current;
-
-    if (!audio) {
-      setActualPlaying(false);
-      return;
-    }
-
-    setActualPlaying(
-      !audio.paused &&
-      !audio.ended &&
-      audio.readyState > 2
-    );
-  };
-
-  const interval = setInterval(syncAudioState, 500);
-
-  document.addEventListener('visibilitychange', syncAudioState);
-  window.addEventListener('focus', syncAudioState);
-  window.addEventListener('pageshow', syncAudioState);
-
-  return () => {
-    clearInterval(interval);
-
-    document.removeEventListener('visibilitychange', syncAudioState);
-    window.removeEventListener('focus', syncAudioState);
-    window.removeEventListener('pageshow', syncAudioState);
-  };
-}, []);
 
   const handlePlay = () => {
     dispatch({type: PLAY, payload: false});
@@ -115,8 +83,8 @@ export const Radio = () => {
       />
       <ContainerPlayVolume className='box'>
         <PlayPause aria-label='PlayPause' type='button' onClick={() => toggleAudio()}>
-            <span className={actualPlaying ? "play active" : "play"}></span>
-            <span className={actualPlaying ? "pause active" : "pause"}></span>
+            <span className={play ? "play active" : "play"}></span>
+            <span className={play ? "pause active" : "pause"}></span>
         </PlayPause>
         {match && <VolumeLogo handleOpenVolume={handleOpenVolume} volumeLogoRef={volumeLogoRef} />}
         {openVolume && match && <Volume containerVolumeRef={containerVolumeRef} />}
