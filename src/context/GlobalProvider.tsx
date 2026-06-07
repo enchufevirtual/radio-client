@@ -234,7 +234,6 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   };
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null;
 
     const getCurrentSong = async () => {
       try {
@@ -261,9 +260,6 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     };
 
     getCurrentSong();
-    interval = setInterval(getCurrentSong, 5000);
-
-    return () => { if (interval) clearInterval(interval); };
   }, []);
 
   const getAudioSource = (src: string): string => {

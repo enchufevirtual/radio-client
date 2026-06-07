@@ -45,3 +45,13 @@ export function getAvatarUrl(
 
   return `https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`;
 }
+
+
+export function resolveImageSrc(image: string | Blob | null | undefined): string {
+  if (!image) return "/default-avatar.png";
+
+  if (typeof image === "string") return image;
+
+  return URL.createObjectURL(image);
+}
+
