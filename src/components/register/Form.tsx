@@ -11,7 +11,7 @@ import { AlertMessage } from "../alert";
 
 export const Form = (): JSX.Element => {
 
-  const { check, username, success, email, password, repeatPassword } = useGlobal();
+  const { check, username, success, email, password, repeatPassword, isSubmitting } = useGlobal();
   const { onSubmit, onChange, handleFile } = check;
 
   return (
@@ -60,7 +60,9 @@ export const Form = (): JSX.Element => {
         />
         <AlertMessage data={{id: 'image'}} />
       </GroupInput>
-      <Button aria-label="Registrar" type="submit">Registrar</Button>
+      <Button aria-label="Registrar" type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Creando cuenta..." : "Registrar"}
+      </Button>
     </FormStyles>
   )
 }

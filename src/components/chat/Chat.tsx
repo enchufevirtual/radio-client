@@ -9,7 +9,7 @@ import { useSocket } from '../../hooks/useSocket';
 import { useGlobal } from '../../hooks/useGlobal';
 import { useAuth } from '../../hooks/useAuth';
 import { CLOSE_LOGIN_CHAT } from '../../context/constants';
-import { resolveImageSrc } from '../../helpers/getAvatarUrl';
+import { getAvatarUrl } from '../../helpers/getAvatarUrl';
 
 export const Chat = () => {
 
@@ -162,7 +162,7 @@ export const Chat = () => {
                 : message.username || message.from || message.name || 'Usuario';
               const color = userColors[displayName] || '#000';
               const imageSource = message.image ?? message.user?.image ?? null;
-              const imgSrc = resolveImageSrc(imageSource);
+              const imgSrc = getAvatarUrl(imageSource, displayName);
               const keyId = message.id ?? (message.createAt ? String(new Date(message.createAt).getTime()) : index);
               return (
                 <ContainerUserChat key={keyId} ref={index === sorted.length - 1 ? lastMessageRef : null}>

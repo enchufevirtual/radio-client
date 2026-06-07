@@ -28,7 +28,9 @@ import {
   STREAM_URL,
   PLAYING_FROM,
   AUDIO_TITLE,
-  SWITCH_TO_RADIO
+  SWITCH_TO_RADIO,
+  SUBMIT_START,
+  SUBMIT_END
 } from "./constants";
 
 interface InputTypes {
@@ -61,7 +63,9 @@ export interface GLOBAL_ACTION {
     | typeof STREAM_URL
     | typeof PLAYING_FROM
     | typeof AUDIO_TITLE
-    | typeof SWITCH_TO_RADIO;
+    | typeof SWITCH_TO_RADIO
+    | typeof SUBMIT_START
+    | typeof SUBMIT_END;
   payload?: any; // You can specify the payload type here if needed
 }
 
@@ -84,6 +88,7 @@ export interface GLOBAL_STATE {
   streamUrl: string,
   playingFrom: 'radio' | 'post',
   audioTitle: string,
+  isSubmitting: boolean
 }
 
 export type GlobalProviderTypes = {
@@ -137,7 +142,8 @@ export type ContextProps = {
   streamUrl: string,
   handleFile: HandleFileCallback<Auth | MyPostTypes>
   previewImage: string,
-  previewAudio: { name: string, size: number }
+  previewAudio: { name: string, size: number },
+  isSubmitting: boolean
 }
 
 // AuthProvider

@@ -19,3 +19,5 @@ export const STREAM_URL = "STREAM_URL";
 export const PLAYING_FROM = "PLAYING_FROM";
 export const AUDIO_TITLE = "AUDIO_TITLE";
 export const SWITCH_TO_RADIO = "SWITCH_TO_RADIO";
+export const SUBMIT_START = "SUBMIT_START";
+export const SUBMIT_END = "SUBMIT_END";

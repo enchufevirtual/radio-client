@@ -20,7 +20,7 @@ export const CardPostItem = ({ user, audio, nameAudio, id, image, content, creat
     newNameAudio = nameAudio
   }
 
-  const url = getAvatarUrl(user?.image, user?.name);
+  const url = getAvatarUrl(user?.image, user?.username);
   const postImage = image ? getAvatarUrl(image) : null;
 
   useEffect(() => {

@@ -23,6 +23,8 @@ import {
   STREAM_URL,
   PLAYING_FROM,
   AUDIO_TITLE,
+  SUBMIT_START,
+  SUBMIT_END
 } from "./constants";
 
 // Allow accessing `process.env` which is injected by the bundler at build time.
@@ -55,6 +57,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     streamUrl: process.env.URL_STREAM || 'https://stream.zeno.fm/hnwgw0jr0gatv',
     playingFrom: 'radio',
     audioTitle: 'Tu nueva experiencia musical',
+    isSubmitting: false,
   }
 
   const [state, dispatch] = useReducer(globalReducer, initialState);
@@ -156,6 +159,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
 
       if (!this.validate()) return;
 
+      dispatch({ type: SUBMIT_START });
+
       try {
 
         const formData = new FormData();
@@ -168,7 +173,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
 
         await clientAxios.post('/users', formData);
         dispatch({type: SUCCESS})
-        CheckBeforeSend.messageNotification('send', 'Revise su correo electrónico para activar su cuenta. ¡Gracias por registrarse!');
+        CheckBeforeSend.messageNotification('send', 'Cuenta creada correctamente. Revisa tu correo para activarla. ¡Gracias por registrarse!');
         dispatch({type: INPUT})
       } catch (error) {
 
@@ -193,7 +198,10 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         }
 
         CheckBeforeSend.messageNotification('send', message);
-      }
+      } finally {
+          // Ensure we always end the submitting state to re-enable the form
+          dispatch({ type: SUBMIT_END });
+        }
     }
     public onChange: ChangeEventHandler<HTMLInputElement> = (event) => {
       const { name, value } = event.target;
@@ -227,9 +235,11 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const lastAudioElementRef = useRef<HTMLAudioElement | null>(null);
     const shouldBePlayingRef = useRef(false);
+    const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
 
     const setAudioRef = (node: HTMLAudioElement | null): void => {
       audioRef.current = node;
+      setAudioElement(node);
       if (node) lastAudioElementRef.current = node;
     };
 
@@ -363,12 +373,23 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       }
 
       if (!audio.src) {
-        audio.src = state.streamUrl;
+        const audioSource = state.currentAudio || state.streamUrl;
+        const playingFromSource = state.currentAudio ? state.playingFrom : 'radio';
+        const audioTitleSource = state.currentAudio ? state.audioTitle : state.currentSong;
+
+        if (!audioSource) {
+          dispatch({ type: PLAY, payload: false });
+          dispatch({ type: IS_PLAYING, payload: false });
+          return;
+        }
+
+        audio.src = audioSource;
         audio.load();
         audio.currentTime = 0;
 
-        dispatch({ type: CURRENT_AUDIO, payload: state.streamUrl });
-        dispatch({ type: PLAYING_FROM, payload: "radio" });
+        dispatch({ type: CURRENT_AUDIO, payload: audioSource });
+        dispatch({ type: PLAYING_FROM, payload: playingFromSource });
+        dispatch({ type: AUDIO_TITLE, payload: audioTitleSource });
 
         await onPlay();
         return;
@@ -450,8 +471,10 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       // AUDIO EVENTS (CLEAN)
       // =========================
       useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio) return;
+        const audio = audioElement;
+        if (!audio) {
+          return undefined;
+        }
 
         const handlePlayEvent = () => {
           dispatch({ type: PLAY, payload: true });
@@ -483,11 +506,32 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
 
         return () => {
           audio.removeEventListener("play", handlePlayEvent);
-          audio.removeEventListener("pause", handlePauseEvent);
-          audio.removeEventListener("ended", handlePauseEvent);
-          audio.removeEventListener("error", handleErrorEvent);
-        };
-      }, [state.volumeValue]);
+        audio.removeEventListener("pause", handlePauseEvent);
+        audio.removeEventListener("ended", handlePauseEvent);
+        audio.removeEventListener("error", handleErrorEvent);
+      };
+    }, [audioElement, state.volumeValue]);
+
+    useEffect(() => {
+      const syncPlaybackState = async () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+          if (document.visibilityState !== 'visible') return;
+        try {
+          await audio.play();
+        } catch (error) {
+          console.warn('Audio sync playback blocked on visibility change:', error);
+        }
+      };
+
+      document.addEventListener('visibilitychange', syncPlaybackState);
+      window.addEventListener('focus', syncPlaybackState);
+
+      return () => {
+        document.removeEventListener('visibilitychange', syncPlaybackState);
+        window.removeEventListener('focus', syncPlaybackState);
+      };
+    }, [state.play]);
 
 
   // Chat
@@ -576,7 +620,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     handleFile,
     zIndexLoading: state.zIndexLoading,
     previewImage: state.previewImage,
-    previewAudio: state.previewAudio
+    previewAudio: state.previewAudio,
+    isSubmitting: state.isSubmitting
   }
 
   const value = {

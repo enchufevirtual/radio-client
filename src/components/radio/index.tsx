@@ -59,8 +59,13 @@ export const Radio = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (!currentAudio && streamUrl) {
-      audio.src = streamUrl;
+    const source = currentAudio || streamUrl;
+    if (!source) return;
+
+    const currentSrc = audio.src || '';
+    if (currentSrc !== source) {
+      audio.src = source;
+      audio.load();
     }
   }, [streamUrl, currentAudio]);
 

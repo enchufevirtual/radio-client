@@ -19,7 +19,9 @@ import {
   STREAM_URL,
   PLAYING_FROM,
   AUDIO_TITLE,
-  SWITCH_TO_RADIO
+  SWITCH_TO_RADIO,
+  SUBMIT_START,
+  SUBMIT_END
 } from "./constants";
 import { GLOBAL_STATE, GLOBAL_ACTION } from "./types";
 
@@ -151,6 +153,17 @@ export function globalReducer (state: GLOBAL_STATE, action: GLOBAL_ACTION) {
         playingFrom: 'radio',
         audioTitle: 'Tu nueva experiencia musical'
       };
+      case SUBMIT_START:
+        return {
+          ...state,
+          isSubmitting: true,
+        };
+
+      case SUBMIT_END:
+        return {
+          ...state,
+          isSubmitting: false,
+        };
 
     default:
       return state;
