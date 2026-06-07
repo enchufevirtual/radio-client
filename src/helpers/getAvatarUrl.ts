@@ -1,4 +1,22 @@
+const INVALID_IMAGE_PATTERN = /^\s*(null|undefined)\s*$/i;
 
+export function normalizeImageValue(
+  image?: string | File | Blob | null
+): string | File | Blob | null {
+  if (image instanceof Blob) {
+    return image;
+  }
+
+  if (typeof image === 'string') {
+    const sanitized = image.trim();
+    if (sanitized.length === 0 || INVALID_IMAGE_PATTERN.test(sanitized)) {
+      return null;
+    }
+    return sanitized;
+  }
+
+  return null;
+}
 
 export function getAvatarUrl(
   image?: string | File | Blob | null,
@@ -7,19 +25,20 @@ export function getAvatarUrl(
   const backend = (process.env.BACKEND_URL ?? "").replace(/\/$/, "");
   const userName = (name?.trim() || "radio-ev").replace(/\s+/g, "-");
 
-  if (image instanceof Blob) {
+  const normalizedImage = normalizeImageValue(image);
+
+  if (normalizedImage instanceof Blob) {
     try {
-      return URL.createObjectURL(image);
+      return URL.createObjectURL(normalizedImage);
     } catch {
       return `https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`;
     }
   }
 
-  if (typeof image === "string" && image.length > 0) {
-    if (/^https?:\/\//.test(image)) return image;
+  if (typeof normalizedImage === "string") {
+    if (/^https?:\/\//.test(normalizedImage)) return normalizedImage;
 
-    // 🔥 AQUÍ ESTÁ EL FIX IMPORTANTE
-    const normalized = image.startsWith("/") ? image : `/${image}`;
+    const normalized = normalizedImage.startsWith("/") ? normalizedImage : `/${normalizedImage}`;
 
     return `${backend}/uploads${normalized}`;
   }

@@ -5,6 +5,7 @@ import { GlobalProviderTypes, Auth, StateUpdater } from "./types";
 import { useGlobal } from "../hooks/useGlobal";
 import { useHandleState } from "../../src/hooks/useHandleState";
 import { getErrorMessage } from "../helpers/getErrorMessage";
+import { normalizeImageValue } from "../helpers/getAvatarUrl";
 import { Data, ErrorRequest } from "../../types/types";
 
 export const AuthProvider = ({children}: GlobalProviderTypes) => {
@@ -56,9 +57,13 @@ const [profile, setProfile] = useState<Auth | null>(null);
     setLoadingPage(true);
 
     const { data } = await clientAxios('/users/profile', config);
+    const sanitizedAuthData = {
+      ...data,
+      image: normalizeImageValue(data.image) ?? '',
+    };
 
-    setAuth(data);
-    setProfile(data);
+    setAuth(sanitizedAuthData);
+    setProfile(sanitizedAuthData);
     setInvalidToken('');
 
   } catch (error) {
@@ -140,10 +145,14 @@ const [profile, setProfile] = useState<Auth | null>(null);
 
       const url = `/users/${id}`;
       const { data } = await clientAxios.put(url, formData, config);
+      const sanitizedAuthData = {
+        ...data,
+        image: normalizeImageValue(data.image) ?? '',
+      };
       messageNotification('image-alert', '');
       messageNotification('send', 'Perfil Actualizado Correctamente');
-      setAuth(data);
-      setProfile(data);
+      setAuth(sanitizedAuthData);
+      setProfile(sanitizedAuthData);
       setSuccess(true);
       setLoadingPage(false)
     } catch (error) {

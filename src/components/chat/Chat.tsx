@@ -161,9 +161,8 @@ export const Chat = () => {
                 ? auth.username || auth.name || 'Usuario'
                 : message.username || message.from || message.name || 'Usuario';
               const color = userColors[displayName] || '#000';
-              const imageUser = isMine
-                ? getAvatarUrl(auth.image, displayName)
-                : getAvatarUrl(message.image, displayName);
+              const imageSource = message.image ?? message.user?.image ?? (isMine ? auth.image : undefined);
+              const imageUser = getAvatarUrl(imageSource, displayName);
               const keyId = message.id ?? (message.createAt ? String(new Date(message.createAt).getTime()) : index);
               return (
                 <ContainerUserChat key={keyId} ref={index === sorted.length - 1 ? lastMessageRef : null}>

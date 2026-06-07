@@ -165,11 +165,11 @@ interface UpdateUserDataTypes {
 }
 
 export interface AuthContextProps {
-  auth: Auth,
-  profile: Auth,
-  setProfile: React.Dispatch<React.SetStateAction<Auth>>,
+  auth: Auth | null,
+  profile: Auth | null,
+  setProfile: React.Dispatch<React.SetStateAction<Auth | null>>,
   authUser: () => Promise<void>,
-  setAuth: React.Dispatch<React.SetStateAction<Auth>>,
+  setAuth: React.Dispatch<React.SetStateAction<Auth | null>>,
   logOut: () => void,
   loading: boolean,
   updateProfile: (data: Auth) => void,

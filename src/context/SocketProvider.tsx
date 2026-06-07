@@ -6,6 +6,7 @@ import { GlobalProviderTypes, Messages } from "./types";
 import { useAuth } from "../hooks/useAuth";
 import { useGlobal } from "../hooks/useGlobal";
 import { CLOSE_LOGIN_CHAT } from "./constants";
+import { normalizeImageValue } from "../helpers/getAvatarUrl";
 
 export const SocketProvider = ({children}: GlobalProviderTypes) => {
 
@@ -58,20 +59,30 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
 
     // ============ Event Handlers ============
 
+    const sanitizeMessageImage = (message: Messages) => {
+      const resolvedImage = normalizeImageValue(message.image) ?? normalizeImageValue(message.user?.image);
+      return {
+        ...message,
+        image: resolvedImage,
+      };
+    };
+
     const handleHistory = (history: Messages[]) => {
       console.info('[Socket] chat:history received, count=', history?.length);
       if (historyTimer) {
         clearTimeout(historyTimer);
         historyTimer = null;
       }
-      setMessages(history);
+      const sanitizedHistory = history.map((item) => sanitizeMessageImage(item));
+      setMessages(sanitizedHistory);
       setLoadingChat(false);
       setConnectionStatus('connected');
     };
 
     const handleMessage = (message: Messages) => {
       console.debug('[Socket] chat:message received from userId:', message.userId);
-      setMessages((prevMessages) => [...prevMessages, message]);
+      const sanitizedMessage = sanitizeMessageImage(message);
+      setMessages((prevMessages) => [...prevMessages, sanitizedMessage]);
     };
 
     const handleError = (error: { message: string }) => {
@@ -91,9 +102,15 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
 
     const handleUserImageUpdated = (data: { userId: number; avatarUrl: string }) => {
       console.debug('[Socket] user-image-updated for userId:', data.userId);
+      const avatarUrl = normalizeImageValue(data.avatarUrl);
+      if (!avatarUrl || typeof avatarUrl !== 'string') return;
       setMessages((prevMessages) => prevMessages.map((msg) => {
         if (String(msg.userId) !== String(data.userId)) return msg;
-        return { ...msg, image: data.avatarUrl };
+        return {
+          ...msg,
+          image: avatarUrl,
+          user: msg.user ? { ...msg.user, image: avatarUrl } : msg.user,
+        };
       }));
     };
 
@@ -212,6 +229,11 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
     return;
   }
 
+  if (!auth?.id) {
+    messageNotification('server', 'Usuario no autenticado. Vuelve a iniciar sesión.');
+    return;
+  }
+
   if (message.trim() === '') {
     setIsInputEmpty(true);
     return;
@@ -231,7 +253,7 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
     from: auth.username,
     name: auth.name,
     body: message,
-    image: auth.image,
+    image: normalizeImageValue(auth.image),
     userId: auth.id,
     createAt: new Date()
   };
@@ -252,15 +274,19 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
   useEffect(() => {
     if (!auth?.id) return;
 
+    const safeAuthImage = normalizeImageValue(auth.image);
+
     setMessages((prevMessages) => prevMessages.map((messageItem) => {
       if (String(messageItem.userId) !== String(auth.id)) return messageItem;
+
+      const currentImage = normalizeImageValue(messageItem.image);
 
       return {
         ...messageItem,
         username: auth.username,
         from: auth.username,
         name: auth.username || auth.name,
-        image: auth.image ?? messageItem.image,
+        image: currentImage ?? safeAuthImage ?? null,
       };
     }));
   }, [ auth?.id, auth?.username, auth?.name,  auth?.image ]);
