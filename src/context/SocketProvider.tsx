@@ -260,7 +260,7 @@ export const SocketProvider = ({children}: GlobalProviderTypes) => {
         username: auth.username,
         from: auth.username,
         name: auth.username || auth.name,
-        image: auth.image,
+        image: auth.image ?? messageItem.image,
       };
     }));
   }, [ auth?.id, auth?.username, auth?.name,  auth?.image ]);
