@@ -62,8 +62,8 @@ export const Profile = () => {
         <ContainerInfoProfile>
           <SkeletonCard>
             <SkeletonHeader>
-              <SkeletonCircle />
               <SkeletonLine width="40%" />
+              <SkeletonCircle />
             </SkeletonHeader>
             <SkeletonLine width="80%" />
             <SkeletonLine width="95%" />
@@ -82,8 +82,8 @@ export const Profile = () => {
 
   if (!selectedProfile) return null;
 
-  const { name, description, createAt, image } = selectedProfile;
-  const url = getAvatarUrl(image, name);
+  const { username, description, createAt, image, name } = selectedProfile;
+  const url = getAvatarUrl(image, username);
 
   const socialmedia = selectedProfile.social
     ? (Object.keys(selectedProfile.social) as Array<keyof typeof selectedProfile.social>)
@@ -99,7 +99,6 @@ export const Profile = () => {
           />
         ))
     : null;
-
 
 
   const handleFooter = () => {

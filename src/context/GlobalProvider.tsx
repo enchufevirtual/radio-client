@@ -221,19 +221,20 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   const { username, email, password, repeatPassword } = state.input;
   let check = new CheckBeforeSend(username, email, password, repeatPassword);
 
-  // Config Radio Ev
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const lastAudioElementRef = useRef<HTMLAudioElement | null>(null);
-  const shouldBePlayingRef = useRef(false);
+    // =========================
+    // AUDIO REFS
+    // =========================
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const lastAudioElementRef = useRef<HTMLAudioElement | null>(null);
+    const shouldBePlayingRef = useRef(false);
 
-  const setAudioRef = (node: HTMLAudioElement | null): void => {
-    audioRef.current = node;
-    if (node) {
-      lastAudioElementRef.current = node;
-    }
-  };
+    const setAudioRef = (node: HTMLAudioElement | null): void => {
+      audioRef.current = node;
+      if (node) lastAudioElementRef.current = node;
+    };
 
   useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
 
     const getCurrentSong = async () => {
       try {
@@ -260,6 +261,9 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     };
 
     getCurrentSong();
+    interval = setInterval(getCurrentSong, 5000);
+
+    return () => { if (interval) clearInterval(interval); };
   }, []);
 
   const getAudioSource = (src: string): string => {
@@ -277,144 +281,107 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     return /^https?:\/\//.test(trimmed) && trimmed.length > 10;
   };
 
-  const onPlay = async (): Promise<void> => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    // =========================
+    // PLAY
+    // =========================
+    const onPlay = async (): Promise<void> => {
+      const audio = audioRef.current;
+      if (!audio) return;
 
-    // Ensure audio has a valid source
-    if (!audio.src || !isValidStreamUrl(audio.src)) {
-      console.warn('Audio has no valid source:', audio.src);
-      dispatch({type: PLAY, payload: false});
-      dispatch({type: IS_PLAYING, payload: false});
-      shouldBePlayingRef.current = false;
-      return;
-    }
-
-    // Determine current intended source based on audio.src (avoid relying on possibly stale state)
-    const localPlayingFrom: 'radio' | 'post' = audio.src && audio.src === state.streamUrl ? 'radio' : 'post';
-
-    if (localPlayingFrom === 'post') {
-      // For on-demand audio, start from the beginning
-      audio.currentTime = 0;
-    } else {
-      // For live radio, reload the live stream so resuming joins current live position
-      if (!isValidStreamUrl(state.streamUrl)) {
-        console.warn('Radio stream not ready yet. StreamUrl:', state.streamUrl);
-        dispatch({type: PLAY, payload: false});
-        dispatch({type: IS_PLAYING, payload: false});
+      if (!audio.src) {
+        dispatch({ type: PLAY, payload: false });
+        dispatch({ type: IS_PLAYING, payload: false });
         shouldBePlayingRef.current = false;
         return;
       }
 
-      if (!audio.src || audio.src !== state.streamUrl) {
-        audio.src = state.streamUrl;
-      }
-
       try {
-        audio.load();
-      } catch (e) {
-        // ignore load errors here, we'll try to play anyway
-      }
-    }
+        shouldBePlayingRef.current = true;
 
-    try {
-      shouldBePlayingRef.current = true;
-      const playPromise = audio.play();
+        const playPromise = audio.play();
         if (playPromise !== undefined) {
-        await playPromise;
-        dispatch({type: PLAY, payload: true});
-        dispatch({type: IS_PLAYING, payload: true});
+          await playPromise;
+        }
+
+        dispatch({ type: PLAY, payload: true });
+        dispatch({ type: IS_PLAYING, payload: true });
+
+      } catch (error) {
+        console.error("Play error:", error);
+
+        shouldBePlayingRef.current = false;
+
+        dispatch({ type: PLAY, payload: false });
+        dispatch({ type: IS_PLAYING, payload: false });
       }
-    } catch (error) {
-      console.error('Play error:', error);
-      shouldBePlayingRef.current = false;
-      // Try to load and play after a short delay
-          setTimeout(() => {
-        if (shouldBePlayingRef.current && audio.src) {
-          audio.load();
-          audio.play().catch(err => {
-            console.error('Retry play failed:', err);
-            dispatch({type: PLAY, payload: false});
-            dispatch({type: IS_PLAYING, payload: false});
-            shouldBePlayingRef.current = false;
-          });
-        }
-      }, 500);
-    }
-  };
+    };
 
-  const onPause = (): void => {
-    const audio = audioRef.current || lastAudioElementRef.current;
-    if (!audio) return;
 
-    // Mark user intent to stop before pausing to avoid recovery logic
-    shouldBePlayingRef.current = false;
-    audio.pause();
-    dispatch({type: PLAY, payload: false});
-    dispatch({type: IS_PLAYING, payload: false});
-  };
+      // =========================
+      // PAUSE
+      // =========================
+      const onPause = (): void => {
+        const audio = audioRef.current || lastAudioElementRef.current;
+        if (!audio) return;
 
-  const toggleAudio = async (src?: string, audioTitle?: string): Promise<void> => {
-    const audio = audioRef.current;
-    if (!audio) {
-      return;
-    }
+        shouldBePlayingRef.current = false;
+        audio.pause();
 
-    const requestedSrc = src?.trim();
-    const requestedAudioSource = requestedSrc ? getAudioSource(requestedSrc) : '';
-    const isSameSource = requestedSrc && state.currentAudio === requestedAudioSource;
+        dispatch({ type: PLAY, payload: false });
+        dispatch({ type: IS_PLAYING, payload: false });
+      };
 
-    // If a specific source is requested
-    if (requestedSrc) {
-      if (!state.currentAudio || !isSameSource) {
-        const audioSource = requestedAudioSource;
-        if (!audioSource) {
-          console.warn('toggleAudio: missing audio source');
-          return;
-        }
-        if (!audio.paused) {
-          audio.pause();
-        }
+
+    // =========================
+    // TOGGLE
+    // =========================
+    const toggleAudio = async (src?: string, audioTitle?: string): Promise<void> => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      const requestedSrc = src?.trim();
+
+      if (requestedSrc) {
+        const audioSource = getAudioSource(requestedSrc);
+
+        if (!audioSource) return;
+
+        audio.pause();
         audio.src = audioSource;
         audio.load();
         audio.currentTime = 0;
-        dispatch({type: CURRENT_AUDIO, payload: audioSource});
-        
-        // If audioTitle is provided, it's a post audio
-        if (audioTitle) {
-          dispatch({type: PLAYING_FROM, payload: 'post'});
-          dispatch({type: AUDIO_TITLE, payload: audioTitle});
-        }
-        
-        await onPlay();
-      }
-      return;
-    }
 
-    // Toggle play/pause on current audio
-    // If no src is set (first time on radio), set it from streamUrl
-    if (!audio.src || !audio.src.trim()) {
-      // Validate that streamUrl is ready before using it
-      if (!isValidStreamUrl(state.streamUrl)) {
-        console.warn('Radio stream not ready yet. StreamUrl:', state.streamUrl);
+        dispatch({ type: CURRENT_AUDIO, payload: audioSource });
+
+        if (audioTitle) {
+          dispatch({ type: PLAYING_FROM, payload: "post" });
+          dispatch({ type: AUDIO_TITLE, payload: audioTitle });
+        }
+
+        await onPlay();
         return;
       }
-      
-      audio.src = state.streamUrl;
-      audio.load();
-      audio.currentTime = 0;
-      dispatch({type: CURRENT_AUDIO, payload: state.streamUrl});
-      dispatch({type: PLAYING_FROM, payload: 'radio'});
-      await onPlay();
-    } else if (audio.paused) {
-      await onPlay();
-    } else {
-      onPause();
-    }
-    // Ensure all code paths return
-    return;
-  };
 
+      if (!audio.src) {
+        audio.src = state.streamUrl;
+        audio.load();
+        audio.currentTime = 0;
+
+        dispatch({ type: CURRENT_AUDIO, payload: state.streamUrl });
+        dispatch({ type: PLAYING_FROM, payload: "radio" });
+
+        await onPlay();
+        return;
+      }
+
+      if (audio.paused) {
+        await onPlay();
+      } else {
+        onPause();
+      }
+    };
+
+    
   const playPostAudio = async (src: string, audioTitle: string): Promise<void> => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -479,125 +446,49 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     dispatch({type: VOLUME_VALUE, payload: parseFloat(e.target.value)})
   }
   
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) {
-      return undefined;
-    }
-
-    let unexpectedPauseTimeout: ReturnType<typeof setTimeout> | null = null;
-
-    const handlePlayEvent = () => {
-      const actuallyPlaying =
-        !audio.paused &&
-        !audio.ended &&
-        audio.readyState > 2;
-
-      dispatch({
-        type: PLAY,
-        payload: actuallyPlaying
-      });
-
-      dispatch({
-        type: IS_PLAYING,
-        payload: actuallyPlaying
-      });
-
-      shouldBePlayingRef.current = actuallyPlaying;
-    };
-
-    const handlePauseEvent = () => {
-      // When the audio element is paused by an external source (e.g. phone voice recording,
-      // browser audio focus changes), do not force resume automatically.
-      shouldBePlayingRef.current = false;
-      dispatch({type: PLAY, payload: false});
-      dispatch({type: IS_PLAYING, payload: false});
-    };
-
-    const handleErrorEvent = (event: Event) => {
-      console.error('Audio error event:', event);
-      dispatch({type: PLAY, payload: false});
-      dispatch({type: IS_PLAYING, payload: false});
-      shouldBePlayingRef.current = false;
-
-      if (audio.src) {
-        unexpectedPauseTimeout = setTimeout(() => {
-          if (shouldBePlayingRef.current || !audio.src) return;
-          audio.load();
-          audio.play().catch(err => {
-            console.error('Recovery after audio error failed:', err);
-            dispatch({type: PLAY, payload: false});
-            dispatch({type: IS_PLAYING, payload: false});
-            shouldBePlayingRef.current = false;
-          });
-        }, 1000);
-      }
-    };
-
-    const handleSuspendEvent = () => {
-      console.warn('Audio suspend event - stream may have paused unexpectedly');
-      shouldBePlayingRef.current = false;
-      dispatch({type: PLAY, payload: false});
-      dispatch({type: IS_PLAYING, payload: false});
-    };
-
-      const syncAudioState = () => {
+     // =========================
+      // AUDIO EVENTS (CLEAN)
+      // =========================
+      useEffect(() => {
+        const audio = audioRef.current;
         if (!audio) return;
 
-        const actuallyPlaying =
-          !audio.paused &&
-          !audio.ended &&
-          audio.readyState > 2;
+        const handlePlayEvent = () => {
+          dispatch({ type: PLAY, payload: true });
+          dispatch({ type: IS_PLAYING, payload: true });
+          shouldBePlayingRef.current = true;
+        };
 
-        dispatch({
-          type: PLAY,
-          payload: actuallyPlaying
-        });
+        const handlePauseEvent = () => {
+          shouldBePlayingRef.current = false;
+          dispatch({ type: PLAY, payload: false });
+          dispatch({ type: IS_PLAYING, payload: false });
+        };
 
-        dispatch({
-          type: IS_PLAYING,
-          payload: actuallyPlaying
-        });
+        const handleErrorEvent = (event: Event) => {
+          console.error("Audio error:", event);
 
-        shouldBePlayingRef.current = actuallyPlaying;
-      };
-    audio.volume = state.volumeValue / 100;
-    audio.addEventListener('play', handlePlayEvent);
-    audio.addEventListener('pause', handlePauseEvent);
-    audio.addEventListener('ended', handlePauseEvent);
-    audio.addEventListener('error', handleErrorEvent);
-    audio.addEventListener('suspend', handleSuspendEvent);
+          shouldBePlayingRef.current = false;
 
-    // Synchronize state when the page regains visibility or focus on mobile/desktop.
-    document.addEventListener('visibilitychange', syncAudioState);
-    const handleVisibilityRestore = () => {
-      syncAudioState();
-      setTimeout(syncAudioState, 200);
-      setTimeout(syncAudioState, 600);
-      setTimeout(syncAudioState, 1200);
-    };
-    window.addEventListener('focus', handleVisibilityRestore);
-    window.addEventListener('pageshow', handleVisibilityRestore);
-    window.addEventListener('blur', handleVisibilityRestore);
-    window.addEventListener('pagehide', handleVisibilityRestore);
+          dispatch({ type: PLAY, payload: false });
+          dispatch({ type: IS_PLAYING, payload: false });
+        };
 
-    const pollInterval = setInterval(syncAudioState, 500);
+        audio.addEventListener("play", handlePlayEvent);
+        audio.addEventListener("pause", handlePauseEvent);
+        audio.addEventListener("ended", handlePauseEvent);
+        audio.addEventListener("error", handleErrorEvent);
 
-    return () => {
-      if (unexpectedPauseTimeout) clearTimeout(unexpectedPauseTimeout);
-      clearInterval(pollInterval);
-      audio.removeEventListener('play', handlePlayEvent);
-      audio.removeEventListener('pause', handlePauseEvent);
-      audio.removeEventListener('ended', handlePauseEvent);
-      audio.removeEventListener('error', handleErrorEvent);
-      audio.removeEventListener('suspend', handleSuspendEvent);
-      document.removeEventListener('visibilitychange', syncAudioState);
-      window.removeEventListener('focus', handleVisibilityRestore);
-      window.removeEventListener('pageshow', handleVisibilityRestore);
-      window.removeEventListener('blur', handleVisibilityRestore);
-      window.removeEventListener('pagehide', handleVisibilityRestore);
-    };
-  }, [state.volumeValue]);
+        audio.volume = state.volumeValue / 100;
+
+        return () => {
+          audio.removeEventListener("play", handlePlayEvent);
+          audio.removeEventListener("pause", handlePauseEvent);
+          audio.removeEventListener("ended", handlePauseEvent);
+          audio.removeEventListener("error", handleErrorEvent);
+        };
+      }, [state.volumeValue]);
+
 
   // Chat
   const handleChat = () => {

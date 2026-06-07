@@ -23,7 +23,7 @@ export const PostAccess = (): JSX.Element => {
     handleShowForm()
   }, [previewImage, previewAudio])
 
-  const url = getAvatarUrl(auth?.image, auth?.name);
+  const url = getAvatarUrl(auth?.image, auth?.username);
 
   return (
     <PostAccessStyles>

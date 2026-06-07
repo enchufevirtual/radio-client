@@ -49,7 +49,7 @@ export const Form = (): JSX.Element => {
   let sizePreviewAudio = "";
   sizePreviewAudio = String(Math.round(previewAudio?.size / 1048576));
 
-  const url = getAvatarUrl(auth?.image, auth?.name);
+  const url = getAvatarUrl(auth?.image, auth?.username);
 
   return (
     <BackFormOpacity>

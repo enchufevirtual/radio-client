@@ -29,7 +29,7 @@ export const SettingsProfile = (): JSX.Element => {
   const { handleFile, previewImage } = useGlobal();
   const { name, username, description, email, social, image } = profile;
 
-  const newImage = previewImage ? String(previewImage) : getAvatarUrl(image, name);
+  const newImage = previewImage ? String(previewImage) : getAvatarUrl(image, username);
 
   if (!profile.id) return null;
 

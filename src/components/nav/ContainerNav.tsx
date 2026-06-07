@@ -10,12 +10,12 @@ const ContainerNav = (): JSX.Element => {
   const matches = useMediaQuery("(max-width: 350px)");
 
   const { auth } = useAuth();
-  const { image, name } = auth;
+  const { image, username, name } = auth;
   const { dispatch, menuNav } = useGlobal();
   const imgRef = useRef(null);
   const truncatedName = name.length > 30 ? name.slice(0, 30) + '...' : name;
 
-  const url = getAvatarUrl(image, name);
+  const url = getAvatarUrl(image, username);
 
   const handleMenu = () => {
     dispatch({type: MENU_NAV, payload: !menuNav});

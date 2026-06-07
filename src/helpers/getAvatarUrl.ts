@@ -20,10 +20,10 @@ export function normalizeImageValue(
 
 export function getAvatarUrl(
   image?: string | File | Blob | null,
-  name?: string
+  username?: string
 ): string {
   const backend = (process.env.BACKEND_URL ?? "").replace(/\/$/, "");
-  const userName = (name?.trim() || "radio-ev").replace(/\s+/g, "-");
+  const userName = (username?.trim() || "radio-ev").replace(/\s+/g, "-");
 
   const normalizedImage = normalizeImageValue(image);
 
@@ -31,7 +31,7 @@ export function getAvatarUrl(
     try {
       return URL.createObjectURL(normalizedImage);
     } catch {
-      return `https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`;
+      return `https://api.dicebear.com/7.x/identicon/svg?seed=${userName}`;
     }
   }
 
@@ -43,7 +43,7 @@ export function getAvatarUrl(
     return `${backend}/uploads${normalized}`;
   }
 
-  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`;
+  return `https://api.dicebear.com/7.x/identicon/svg?seed=${userName}`;
 }
 
 
