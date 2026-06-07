@@ -79,6 +79,14 @@ export const GuestNotice = styled.div`
   line-height: 1.4;
   width: calc(100% - 2rem);
 `;
+
+export const AudioStatus = styled.div`
+  margin: 0.25rem 0 0.5rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 11px;
+  text-align: center;
+  width: calc(100% - 2rem);
+`;
 export const ContainerUserChat = styled.div`
   display: flex;
   align-items: flex-start;

@@ -234,8 +234,11 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     // =========================
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const lastAudioElementRef = useRef<HTMLAudioElement | null>(null);
-    const shouldBePlayingRef = useRef(false);
+    // tracks whether the user explicitly requested play (true) or pause (false)
+    // null means no explicit user action yet
+    const userRequestedPlayRef = useRef<boolean | null>(null);
     const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+    const debugAudio = true;
 
     const setAudioRef = (node: HTMLAudioElement | null): void => {
       audioRef.current = node;
@@ -284,6 +287,15 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     return `${backend}/${trimmed.replace(/^\//, '')}`;
   };
 
+  const resetAudioSource = (): void => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (audio.src) {
+      audio.src = '';
+      audio.load();
+    }
+  };
+
   const isValidStreamUrl = (url: string): boolean => {
     if (!url || !url.trim()) return false;
     const trimmed = url.trim();
@@ -299,27 +311,26 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       if (!audio) return;
 
       if (!audio.src) {
+        if (debugAudio) console.log('[audio] onPlay called but no src', { statePlay: state.play, audioSrc: audio.src, paused: audio.paused });
         dispatch({ type: PLAY, payload: false });
         dispatch({ type: IS_PLAYING, payload: false });
-        shouldBePlayingRef.current = false;
         return;
       }
 
       try {
-        shouldBePlayingRef.current = true;
-
         const playPromise = audio.play();
         if (playPromise !== undefined) {
           await playPromise;
         }
 
+        if (debugAudio) console.log('[audio] play success', { audioSrc: audio.src, paused: audio.paused, currentTime: audio.currentTime });
+
         dispatch({ type: PLAY, payload: true });
         dispatch({ type: IS_PLAYING, payload: true });
-
       } catch (error) {
         console.error("Play error:", error);
 
-        shouldBePlayingRef.current = false;
+        if (debugAudio) console.log('[audio] play failed', { audioSrc: audio.src, paused: audio.paused, currentTime: audio.currentTime });
 
         dispatch({ type: PLAY, payload: false });
         dispatch({ type: IS_PLAYING, payload: false });
@@ -334,9 +345,11 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         const audio = audioRef.current || lastAudioElementRef.current;
         if (!audio) return;
 
-        shouldBePlayingRef.current = false;
-        audio.pause();
+        if (debugAudio) console.log('[audio] onPause', { audioSrc: audio.src, paused: audio.paused, currentTime: audio.currentTime, statePlay: state.play });
 
+        userRequestedPlayRef.current = false;
+        audio.pause();
+        resetAudioSource();
         dispatch({ type: PLAY, payload: false });
         dispatch({ type: IS_PLAYING, payload: false });
       };
@@ -364,10 +377,11 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         dispatch({ type: CURRENT_AUDIO, payload: audioSource });
 
         if (audioTitle) {
-          dispatch({ type: PLAYING_FROM, payload: "post" });
+          dispatch({ type: PLAYING_FROM, payload: 'post' });
           dispatch({ type: AUDIO_TITLE, payload: audioTitle });
         }
 
+        userRequestedPlayRef.current = true;
         await onPlay();
         return;
       }
@@ -391,13 +405,18 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         dispatch({ type: PLAYING_FROM, payload: playingFromSource });
         dispatch({ type: AUDIO_TITLE, payload: audioTitleSource });
 
+        userRequestedPlayRef.current = true;
         await onPlay();
         return;
       }
 
-      if (audio.paused) {
+      const actualPaused = audio.paused || audio.ended;
+
+      if (actualPaused) {
+        userRequestedPlayRef.current = true;
         await onPlay();
       } else {
+        userRequestedPlayRef.current = false;
         onPause();
       }
     };
@@ -418,14 +437,13 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         audio.pause();
       }
 
+      userRequestedPlayRef.current = true;
       audio.src = audioSource;
       audio.load();
       audio.currentTime = 0;
-      dispatch({type: CURRENT_AUDIO, payload: audioSource});
-      dispatch({type: PLAYING_FROM, payload: 'post'});
-      dispatch({type: AUDIO_TITLE, payload: audioTitle});
-      
-      // Just play directly without waiting
+      dispatch({ type: CURRENT_AUDIO, payload: audioSource });
+      dispatch({ type: PLAYING_FROM, payload: 'post' });
+      dispatch({ type: AUDIO_TITLE, payload: audioTitle });
       await onPlay();
     } catch (error) {
       console.error('Error playing post audio:', error);
@@ -448,14 +466,13 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         audio.pause();
       }
 
+      userRequestedPlayRef.current = true;
       audio.src = state.streamUrl;
       audio.load();
       audio.currentTime = 0;
-      dispatch({type: CURRENT_AUDIO, payload: state.streamUrl});
-      dispatch({type: PLAYING_FROM, payload: 'radio'});
-      dispatch({type: AUDIO_TITLE, payload: state.currentSong});
-      
-      // Just play directly
+      dispatch({ type: CURRENT_AUDIO, payload: state.streamUrl });
+      dispatch({ type: PLAYING_FROM, payload: 'radio' });
+      dispatch({ type: AUDIO_TITLE, payload: state.currentSong });
       await onPlay();
     } catch (error) {
       console.error('Error switching to radio:', error);
@@ -477,24 +494,35 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         }
 
         const handlePlayEvent = () => {
+          if (debugAudio) console.log('[audio event] play', { src: audio.src, currentTime: audio.currentTime, paused: audio.paused });
           dispatch({ type: PLAY, payload: true });
           dispatch({ type: IS_PLAYING, payload: true });
-          shouldBePlayingRef.current = true;
         };
 
         const handlePauseEvent = () => {
-          shouldBePlayingRef.current = false;
+          if (debugAudio) console.log('[audio event] pause/ended', { src: audio.src, currentTime: audio.currentTime, paused: audio.paused });
+          userRequestedPlayRef.current = false;
+          resetAudioSource();
           dispatch({ type: PLAY, payload: false });
           dispatch({ type: IS_PLAYING, payload: false });
         };
 
         const handleErrorEvent = (event: Event) => {
           console.error("Audio error:", event);
-
-          shouldBePlayingRef.current = false;
-
           dispatch({ type: PLAY, payload: false });
           dispatch({ type: IS_PLAYING, payload: false });
+        };
+
+        const handlePlayingEvent = () => {
+          console.log('[audio event] playing', { src: audio.src, currentTime: audio.currentTime, readyState: audio.readyState });
+        };
+
+        const handleWaitingEvent = () => {
+          console.log('[audio event] waiting', { src: audio.src, currentTime: audio.currentTime, readyState: audio.readyState });
+        };
+
+        const handleSuspendEvent = () => {
+          console.log('[audio event] suspend', { src: audio.src, currentTime: audio.currentTime, readyState: audio.readyState });
         };
 
         audio.addEventListener("play", handlePlayEvent);
@@ -502,37 +530,64 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         audio.addEventListener("ended", handlePauseEvent);
         audio.addEventListener("error", handleErrorEvent);
 
+        if (debugAudio) {
+          audio.addEventListener('playing', handlePlayingEvent);
+          audio.addEventListener('waiting', handleWaitingEvent);
+          audio.addEventListener('suspend', handleSuspendEvent);
+        }
+
         audio.volume = state.volumeValue / 100;
 
         return () => {
           audio.removeEventListener("play", handlePlayEvent);
-        audio.removeEventListener("pause", handlePauseEvent);
-        audio.removeEventListener("ended", handlePauseEvent);
-        audio.removeEventListener("error", handleErrorEvent);
-      };
+          audio.removeEventListener("pause", handlePauseEvent);
+          audio.removeEventListener("ended", handlePauseEvent);
+          audio.removeEventListener("error", handleErrorEvent);
+          if (debugAudio) {
+            audio.removeEventListener('playing', handlePlayingEvent);
+            audio.removeEventListener('waiting', handleWaitingEvent);
+            audio.removeEventListener('suspend', handleSuspendEvent);
+          }
+        };
     }, [audioElement, state.volumeValue]);
 
     useEffect(() => {
-      const syncPlaybackState = async () => {
-        const audio = audioRef.current;
-        if (!audio) return;
-          if (document.visibilityState !== 'visible') return;
+      const audio = audioElement;
+      if (!audio || !('mediaSession' in navigator)) return undefined;
+
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: state.audioTitle || state.currentSong || 'Radio Ev',
+        artist: 'Radio Ev',
+        album: state.playingFrom === 'radio' ? 'Radio en Vivo' : 'Audio Post'
+      });
+
+      navigator.mediaSession.setActionHandler('play', async () => {
+        if (!audio.src) {
+          audio.src = state.currentAudio || state.streamUrl;
+          audio.load();
+        }
+        userRequestedPlayRef.current = true;
         try {
           await audio.play();
         } catch (error) {
-          console.warn('Audio sync playback blocked on visibility change:', error);
+          console.warn('Media session play blocked:', error);
         }
-      };
+      });
 
-      document.addEventListener('visibilitychange', syncPlaybackState);
-      window.addEventListener('focus', syncPlaybackState);
+      navigator.mediaSession.setActionHandler('pause', () => {
+        audio.pause();
+      });
+
+      navigator.mediaSession.setActionHandler('stop', () => {
+        audio.pause();
+      });
 
       return () => {
-        document.removeEventListener('visibilitychange', syncPlaybackState);
-        window.removeEventListener('focus', syncPlaybackState);
+        navigator.mediaSession.setActionHandler('play', null);
+        navigator.mediaSession.setActionHandler('pause', null);
+        navigator.mediaSession.setActionHandler('stop', null);
       };
-    }, [state.play]);
-
+    }, [audioElement, state.audioTitle, state.currentSong, state.currentAudio, state.streamUrl]);
 
   // Chat
   const handleChat = () => {

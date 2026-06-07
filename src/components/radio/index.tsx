@@ -33,6 +33,8 @@ export const Radio = () => {
     switchToRadio();
   }
 
+  const isAudioPlaying = audioRef.current ? !audioRef.current.paused && !audioRef.current.ended : play;
+
   const handleOpenVolume = () => {
     setOpenVolume(!openVolume);
   }
@@ -88,8 +90,8 @@ export const Radio = () => {
       />
       <ContainerPlayVolume className='box'>
         <PlayPause aria-label='PlayPause' type='button' onClick={() => toggleAudio()}>
-            <span className={play ? "play active" : "play"}></span>
-            <span className={play ? "pause active" : "pause"}></span>
+            <span className={isAudioPlaying ? "play active" : "play"}></span>
+            <span className={isAudioPlaying ? "pause active" : "pause"}></span>
         </PlayPause>
         {match && <VolumeLogo handleOpenVolume={handleOpenVolume} volumeLogoRef={volumeLogoRef} />}
         {openVolume && match && <Volume containerVolumeRef={containerVolumeRef} />}
