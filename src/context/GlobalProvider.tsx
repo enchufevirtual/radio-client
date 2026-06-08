@@ -290,10 +290,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
   const resetAudioSource = (): void => {
     const audio = audioRef.current;
     if (!audio) return;
-    if (audio.src) {
-      audio.src = '';
-      audio.load();
-    }
+    audio.removeAttribute('src');
+    audio.load();
   };
 
   const isValidStreamUrl = (url: string): boolean => {
@@ -310,7 +308,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       const audio = audioRef.current;
       if (!audio) return;
 
-      if (!audio.src) {
+      const audioSrcAttribute = audio.getAttribute('src');
+      if (!audioSrcAttribute) {
         if (debugAudio) console.log('[audio] onPlay called but no src', { statePlay: state.play, audioSrc: audio.src, paused: audio.paused });
         dispatch({ type: PLAY, payload: false });
         dispatch({ type: IS_PLAYING, payload: false });
@@ -386,7 +385,9 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         return;
       }
 
-      if (!audio.src) {
+      const audioSrcAttribute = audio.getAttribute('src');
+
+      if (!audioSrcAttribute) {
         const audioSource = state.currentAudio || state.streamUrl;
         const playingFromSource = state.currentAudio ? state.playingFrom : 'radio';
         const audioTitleSource = state.currentAudio ? state.audioTitle : state.currentSong;
@@ -562,7 +563,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       });
 
       navigator.mediaSession.setActionHandler('play', async () => {
-        if (!audio.src) {
+        const audioSrcAttribute = audio.getAttribute('src');
+        if (!audioSrcAttribute) {
           audio.src = state.currentAudio || state.streamUrl;
           audio.load();
         }
