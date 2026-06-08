@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, ChangeEventHandler } from 'react'
-import { ChatStyle, BodyMessage, ContainerMessages, Form, ContainerUserChat, ContainerEmojis, GuestNotice, AudioStatus, EmptyChat, SkeletonMessageBox, SkeletonLine } from './styles';
+import { ChatStyle, BodyMessage, ContainerMessages, Form, ContainerUserChat, ContainerEmojis, GuestNotice, EmptyChat, SkeletonMessageBox, SkeletonLine } from './styles';
 import { IconEmoji } from './IconEmoji';
 import { Emojis } from './Emojis';
 import randomColor from 'randomcolor';
@@ -41,24 +41,6 @@ export const Chat = () => {
 
   const isGuest = !auth?.id;
   const isConnecting = loadingChat && messages.length === 0;
-  const [audioStatus, setAudioStatus] = useState('Audio: inicializando');
-
-  useEffect(() => {
-    const updateAudioStatus = () => {
-      const audio = audioRef.current;
-      const uiState = play ? 'play' : 'pause';
-      if (!audio) {
-        setAudioStatus(`Audio: UI=${uiState}, actual=no element`);
-        return;
-      }
-      const actualState = audio.ended ? 'ended' : audio.paused ? 'paused' : 'playing';
-      setAudioStatus(`Audio: UI=${uiState}, actual=${actualState}`);
-    };
-
-    updateAudioStatus();
-    const intervalId = window.setInterval(updateAudioStatus, 500);
-    return () => window.clearInterval(intervalId);
-  }, [audioRef, play]);
 
   useEffect(() => {
     if (!isGuest && !allowed) {
@@ -196,7 +178,6 @@ export const Chat = () => {
       {isGuest && (
         <>
           <GuestNotice>¿Team frío ❄️ o team calor ☀️?</GuestNotice>
-          <AudioStatus>{audioStatus}</AudioStatus>
         </>
       )}
       <UsersOnlineIndicator count={usersOnline} guestsCount={guestsOnline} />

@@ -238,7 +238,6 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     // null means no explicit user action yet
     const userRequestedPlayRef = useRef<boolean | null>(null);
     const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
-    const debugAudio = true;
 
     const setAudioRef = (node: HTMLAudioElement | null): void => {
       audioRef.current = node;
@@ -310,7 +309,6 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
 
       const audioSrcAttribute = audio.getAttribute('src');
       if (!audioSrcAttribute) {
-        if (debugAudio) console.log('[audio] onPlay called but no src', { statePlay: state.play, audioSrc: audio.src, paused: audio.paused });
         dispatch({ type: PLAY, payload: false });
         dispatch({ type: IS_PLAYING, payload: false });
         return;
@@ -322,14 +320,10 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
           await playPromise;
         }
 
-        if (debugAudio) console.log('[audio] play success', { audioSrc: audio.src, paused: audio.paused, currentTime: audio.currentTime });
-
         dispatch({ type: PLAY, payload: true });
         dispatch({ type: IS_PLAYING, payload: true });
       } catch (error) {
         console.error("Play error:", error);
-
-        if (debugAudio) console.log('[audio] play failed', { audioSrc: audio.src, paused: audio.paused, currentTime: audio.currentTime });
 
         dispatch({ type: PLAY, payload: false });
         dispatch({ type: IS_PLAYING, payload: false });
@@ -343,8 +337,6 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
       const onPause = (): void => {
         const audio = audioRef.current || lastAudioElementRef.current;
         if (!audio) return;
-
-        if (debugAudio) console.log('[audio] onPause', { audioSrc: audio.src, paused: audio.paused, currentTime: audio.currentTime, statePlay: state.play });
 
         userRequestedPlayRef.current = false;
         audio.pause();
@@ -495,13 +487,11 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         }
 
         const handlePlayEvent = () => {
-          if (debugAudio) console.log('[audio event] play', { src: audio.src, currentTime: audio.currentTime, paused: audio.paused });
           dispatch({ type: PLAY, payload: true });
           dispatch({ type: IS_PLAYING, payload: true });
         };
 
         const handlePauseEvent = () => {
-          if (debugAudio) console.log('[audio event] pause/ended', { src: audio.src, currentTime: audio.currentTime, paused: audio.paused });
           userRequestedPlayRef.current = false;
           resetAudioSource();
           dispatch({ type: PLAY, payload: false });
@@ -514,28 +504,10 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
           dispatch({ type: IS_PLAYING, payload: false });
         };
 
-        const handlePlayingEvent = () => {
-          console.log('[audio event] playing', { src: audio.src, currentTime: audio.currentTime, readyState: audio.readyState });
-        };
-
-        const handleWaitingEvent = () => {
-          console.log('[audio event] waiting', { src: audio.src, currentTime: audio.currentTime, readyState: audio.readyState });
-        };
-
-        const handleSuspendEvent = () => {
-          console.log('[audio event] suspend', { src: audio.src, currentTime: audio.currentTime, readyState: audio.readyState });
-        };
-
         audio.addEventListener("play", handlePlayEvent);
         audio.addEventListener("pause", handlePauseEvent);
         audio.addEventListener("ended", handlePauseEvent);
         audio.addEventListener("error", handleErrorEvent);
-
-        if (debugAudio) {
-          audio.addEventListener('playing', handlePlayingEvent);
-          audio.addEventListener('waiting', handleWaitingEvent);
-          audio.addEventListener('suspend', handleSuspendEvent);
-        }
 
         audio.volume = state.volumeValue / 100;
 
@@ -544,11 +516,6 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
           audio.removeEventListener("pause", handlePauseEvent);
           audio.removeEventListener("ended", handlePauseEvent);
           audio.removeEventListener("error", handleErrorEvent);
-          if (debugAudio) {
-            audio.removeEventListener('playing', handlePlayingEvent);
-            audio.removeEventListener('waiting', handleWaitingEvent);
-            audio.removeEventListener('suspend', handleSuspendEvent);
-          }
         };
     }, [audioElement, state.volumeValue]);
 
