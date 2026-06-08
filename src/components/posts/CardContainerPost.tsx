@@ -29,6 +29,8 @@ export const CardContainerPost = ({allAllowedPost}: AllAllowedPost): JSX.Element
       />
     ))
 
+  const showPostSkeleton = loadingPosts && allAllowedPost;
+
   if (!filterPost.length && !loadingPosts) {
     return <NoContent>Aún no hay publicaciones</NoContent>
   }
@@ -36,7 +38,7 @@ export const CardContainerPost = ({allAllowedPost}: AllAllowedPost): JSX.Element
   return (
     <>
       {dataCard}
-      {loadingPosts && (
+      {showPostSkeleton && (
         <>
           {Array.from({ length: 4 }).map((_, index) => (
             <SkeletonCard key={`skeleton-${index}`}>

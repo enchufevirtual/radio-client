@@ -47,18 +47,16 @@ export const Nav = (): JSX.Element => {
       <ContainerLogoNav >
         <Logo />
       </ContainerLogoNav>
-      <Suspense fallback={<div>Loading...</div>}>
         { loading ? (
           <SkeletonNav>
-            <div />
             <span />
+            <div />
           </SkeletonNav>
         ) : auth?.id ? (
           <ContainerNav />
         ) : (
           <ContainerButtons />
         ) }
-      </Suspense>
     </Header>
   );
 }

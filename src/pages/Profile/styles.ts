@@ -34,14 +34,16 @@ export const ContainerInfoProfile= styled.div`
   margin-top: 70px;
   gap: 1rem;
   @media (max-width: 991px) {
-    width: 500px;
+    width: 100%;
   }
 `;
 export const ContainerPostProfile= styled.div`
   display: flex;
   align-self: flex-start;
+  width: 100%;
   @media (max-width: 991px) {
     max-width: 100%;
+    width: 100%;
   }
 `;
 
@@ -104,6 +106,10 @@ export const SkeletonCard = styled.div`
   min-height: 140px;
   position: relative;
   overflow: hidden;
+
+  @media (max-width: 991px) {
+    margin-top: 0;
+  }
 
   &::before {
     content: "";

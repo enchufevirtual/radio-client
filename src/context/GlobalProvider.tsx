@@ -237,6 +237,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
     // tracks whether the user explicitly requested play (true) or pause (false)
     // null means no explicit user action yet
     const userRequestedPlayRef = useRef<boolean | null>(null);
+    // tracks if user clicked play while stream URL wasn't ready yet
+    const pendingPlayRequestRef = useRef<boolean>(false);
     const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
 
     const setAudioRef = (node: HTMLAudioElement | null): void => {
@@ -258,6 +260,29 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         const isPlayingRadio = audioEl && audioEl.src === data.streamUrl;
         if (isPlayingRadio) {
           dispatch({ type: AUDIO_TITLE, payload: data.title });
+        }
+
+        // AUTO-PLAY if user requested play while URL wasn't ready
+        if (pendingPlayRequestRef.current && audioEl && !audioEl.src) {
+          audioEl.src = data.streamUrl;
+          audioEl.load();
+          audioEl.currentTime = 0;
+          dispatch({ type: CURRENT_AUDIO, payload: data.streamUrl });
+          dispatch({ type: PLAYING_FROM, payload: 'radio' });
+          dispatch({ type: AUDIO_TITLE, payload: data.title });
+          
+          try {
+            await audioEl.play();
+            dispatch({ type: PLAY, payload: true });
+            dispatch({ type: IS_PLAYING, payload: true });
+            userRequestedPlayRef.current = true;
+          } catch (playError) {
+            console.error("Auto-play error after URL loaded:", playError);
+            dispatch({ type: PLAY, payload: false });
+            dispatch({ type: IS_PLAYING, payload: false });
+          }
+          
+          pendingPlayRequestRef.current = false;
         }
 
         dispatch({ type: ZENO_API, payload: false });
@@ -373,6 +398,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         }
 
         userRequestedPlayRef.current = true;
+        pendingPlayRequestRef.current = false;
         await onPlay();
         return;
       }
@@ -385,8 +411,8 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         const audioTitleSource = state.currentAudio ? state.audioTitle : state.currentSong;
 
         if (!audioSource) {
-          dispatch({ type: PLAY, payload: false });
-          dispatch({ type: IS_PLAYING, payload: false });
+          // URL NOT READY YET - Mark as pending play request to auto-play when URL loads
+          pendingPlayRequestRef.current = true;
           return;
         }
 
@@ -399,6 +425,7 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
         dispatch({ type: AUDIO_TITLE, payload: audioTitleSource });
 
         userRequestedPlayRef.current = true;
+        pendingPlayRequestRef.current = false;
         await onPlay();
         return;
       }
@@ -407,9 +434,11 @@ export const GlobalProvider = ({children}: GlobalProviderTypes) => {
 
       if (actualPaused) {
         userRequestedPlayRef.current = true;
+        pendingPlayRequestRef.current = false;
         await onPlay();
       } else {
         userRequestedPlayRef.current = false;
+        pendingPlayRequestRef.current = false;
         onPause();
       }
     };

@@ -68,8 +68,16 @@ export const Radio = () => {
     if (currentSrc !== source) {
       audio.src = source;
       audio.load();
+      
+      // If user requested play (play state is true) but audio wasn't playing,
+      // try to start playback now that source is available
+      if (play && audio.paused) {
+        audio.play().catch((error) => {
+          console.warn('Autoplay attempt failed:', error);
+        });
+      }
     }
-  }, [streamUrl, currentAudio]);
+  }, [streamUrl, currentAudio, play]);
 
   return (
     <RadioStyle className="Radio">
