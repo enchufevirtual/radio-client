@@ -13,6 +13,7 @@ import {
   ContainerPostProfile,
   SkeletonCard,
   SkeletonNoMarginCard,
+  ContainerSkeletonProfile,
   SkeletonHeader,
   SkeletonCircle,
   SkeletonLine
@@ -59,7 +60,7 @@ export const Profile = () => {
   if (loadingUser) {
     return (
       <ContainerProfile>
-        <ContainerInfoProfile>
+        <ContainerSkeletonProfile>
           <SkeletonCard>
             <SkeletonHeader>
               <SkeletonLine width="40%" />
@@ -69,7 +70,7 @@ export const Profile = () => {
             <SkeletonLine width="95%" />
             <SkeletonLine width="60%" />
           </SkeletonCard>
-        </ContainerInfoProfile>
+        </ContainerSkeletonProfile>
         <ContainerPostProfile>
           <SkeletonNoMarginCard>
             <SkeletonLine width="90%" />

@@ -19,6 +19,7 @@ export function useUser() {
   const { dispatch } = useGlobal();
 
     async function handleUser(username?: string): Promise<void> {
+        setLoadingUser(true);
         if (!username) return;
     dispatch({type: ZINDEX_LOADING, payload: 8});
     const token = localStorage.getItem('token_ev');
@@ -35,7 +36,6 @@ export function useUser() {
     };
 
     try {
-      setLoadingUser(true);
       let id;
 
       if (username.includes(" ")) {

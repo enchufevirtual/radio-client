@@ -2,7 +2,6 @@ import React from 'react';
 import type { ReactNode } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth'
-import { SkeletonPageLoader } from './styles';
 
 interface ProtectedRouteProps {
   roles: string[];
@@ -13,7 +12,7 @@ export const ProtectedRoute = ({ roles, children }: ProtectedRouteProps): JSX.El
 
   const { auth, loading } = useAuth();
 
-  if (loading) return <SkeletonPageLoader />
+  if (loading) return <></>
 
   if (!auth?.id || !roles.includes(auth?.role)) {
     return <Navigate to='/' />

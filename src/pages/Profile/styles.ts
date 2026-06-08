@@ -37,6 +37,11 @@ export const ContainerInfoProfile= styled.div`
     width: 100%;
   }
 `;
+export const ContainerSkeletonProfile= styled(ContainerInfoProfile)`
+margin-top: 0 !important;
+
+`;
+
 export const ContainerPostProfile= styled.div`
   display: flex;
   align-self: flex-start;
@@ -100,16 +105,11 @@ export const SkeletonCard = styled.div`
   gap: 10px;
   background-color: ${COLOR_CONTAINER};
   border-radius: 10px;
-  margin-top: -70px;
   padding: 1rem;
   width: 100%;
   min-height: 140px;
   position: relative;
   overflow: hidden;
-
-  @media (max-width: 991px) {
-    margin-top: 0;
-  }
 
   &::before {
     content: "";
