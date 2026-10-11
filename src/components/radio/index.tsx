@@ -93,7 +93,6 @@ export const Radio = () => {
       <audio 
         onEnded={handlePlay} 
         ref={setAudioRef}
-        crossOrigin="anonymous"
         preload="auto"
       />
       <ContainerPlayVolume className='box'>
