@@ -397,7 +397,7 @@ npm start
 npm run build
 ```
 
-- Creates optimized production bundle in `dist/` folder
+- Creates optimized production bundle in `build/` folder
 - Minifies and tree-shakes unused code
 - Generates source maps for debugging
 - ~60-70% smaller than development bundle
@@ -409,7 +409,7 @@ npm run dev
 ```
 
 - One-time TypeScript compilation
-- Generates `dist/` folder for manual testing
+- Generates `build/` folder for manual testing
 - Useful for debugging build issues
 
 ---
@@ -525,7 +525,7 @@ const fetchData = async () => {
    npm install -g serve
    
    # Serve production build
-   serve -s dist
+   serve -s build
    ```
 
 3. **Verify in browser:**
@@ -553,7 +553,7 @@ URL_STREAM=https://stream.zeno.fm/your_stream_id
 - **GitHub Pages**
 - **Traditional server** (Apache, Nginx)
 
-The `dist/` folder contains all files needed for production deployment.
+The `build/` folder contains all files needed for production deployment.
 
 ---
 
@@ -626,7 +626,7 @@ npm install
 **Solution:**
 ```bash
 # 1. Clear webpack cache
-rm -rf dist/ node_modules/.cache
+rm -rf build/ node_modules/.cache
 
 # 2. Restart dev server
 npm start

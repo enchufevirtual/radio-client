@@ -28,9 +28,12 @@ jobs:
       - name: Build (production)
         run: npm run build
 
+      - name: Configure custom domain
+        run: echo radio.enchufevirtual.com > ./build/CNAME
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./build
           publish_branch: gh-pages
