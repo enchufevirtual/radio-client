@@ -47,7 +47,7 @@ module.exports = (env) => {
         template: './src/public/index.html',
         filename: './index.html',
         inject: 'body',
-        favicon: path.resolve(__dirname, 'src/public/assets/favicon.ico'),
+        favicon: path.resolve(__dirname, 'src/public/assets/favicon.png'),
       }),
       new Dotenv({
         path: './.env',

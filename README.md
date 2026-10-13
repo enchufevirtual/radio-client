@@ -336,7 +336,7 @@ radio-client/
 │   └── public/                           # Static assets
 │       ├── index.html                    # HTML entry point
 │       ├── assets/                       # Images, fonts, etc.
-│       └── favicon.ico
+│       └── favicon.png
 │
 ├── types/                                # TypeScript type definitions
 │   ├── assets.d.ts                       # Asset type definitions
